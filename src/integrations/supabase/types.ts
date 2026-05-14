@@ -14,7 +14,226 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      clients: {
+        Row: {
+          adresse: string | null
+          created_at: string
+          email: string | null
+          id: string
+          nom: string
+          notes: string | null
+          telephone: string | null
+          updated_at: string
+        }
+        Insert: {
+          adresse?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          nom: string
+          notes?: string | null
+          telephone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          adresse?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          nom?: string
+          notes?: string | null
+          telephone?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      commandes: {
+        Row: {
+          client_id: string | null
+          created_at: string
+          date_commande: string
+          date_livraison: string | null
+          description: string | null
+          id: string
+          notes: string | null
+          prix_total: number
+          statut: string
+          titre: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          client_id?: string | null
+          created_at?: string
+          date_commande?: string
+          date_livraison?: string | null
+          description?: string | null
+          id?: string
+          notes?: string | null
+          prix_total?: number
+          statut?: string
+          titre: string
+          type?: string
+          updated_at?: string
+        }
+        Update: {
+          client_id?: string | null
+          created_at?: string
+          date_commande?: string
+          date_livraison?: string | null
+          description?: string | null
+          id?: string
+          notes?: string | null
+          prix_total?: number
+          statut?: string
+          titre?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "commandes_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      depenses: {
+        Row: {
+          categorie: string
+          created_at: string
+          date_depense: string
+          description: string
+          id: string
+          montant: number
+          notes: string | null
+        }
+        Insert: {
+          categorie?: string
+          created_at?: string
+          date_depense?: string
+          description: string
+          id?: string
+          montant: number
+          notes?: string | null
+        }
+        Update: {
+          categorie?: string
+          created_at?: string
+          date_depense?: string
+          description?: string
+          id?: string
+          montant?: number
+          notes?: string | null
+        }
+        Relationships: []
+      }
+      materiaux: {
+        Row: {
+          created_at: string
+          fournisseur: string | null
+          id: string
+          nom: string
+          notes: string | null
+          prix_unitaire: number
+          quantite: number
+          seuil_alerte: number
+          unite: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          fournisseur?: string | null
+          id?: string
+          nom: string
+          notes?: string | null
+          prix_unitaire?: number
+          quantite?: number
+          seuil_alerte?: number
+          unite?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          fournisseur?: string | null
+          id?: string
+          nom?: string
+          notes?: string | null
+          prix_unitaire?: number
+          quantite?: number
+          seuil_alerte?: number
+          unite?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      notes: {
+        Row: {
+          contenu: string | null
+          couleur: string
+          created_at: string
+          id: string
+          titre: string
+          updated_at: string
+        }
+        Insert: {
+          contenu?: string | null
+          couleur?: string
+          created_at?: string
+          id?: string
+          titre: string
+          updated_at?: string
+        }
+        Update: {
+          contenu?: string | null
+          couleur?: string
+          created_at?: string
+          id?: string
+          titre?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      paiements: {
+        Row: {
+          commande_id: string | null
+          created_at: string
+          date_paiement: string
+          id: string
+          methode: string
+          montant: number
+          notes: string | null
+        }
+        Insert: {
+          commande_id?: string | null
+          created_at?: string
+          date_paiement?: string
+          id?: string
+          methode?: string
+          montant: number
+          notes?: string | null
+        }
+        Update: {
+          commande_id?: string | null
+          created_at?: string
+          date_paiement?: string
+          id?: string
+          methode?: string
+          montant?: number
+          notes?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "paiements_commande_id_fkey"
+            columns: ["commande_id"]
+            isOneToOne: false
+            referencedRelation: "commandes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
