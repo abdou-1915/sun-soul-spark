@@ -32,7 +32,7 @@ function ClientsPage() {
   });
 
   const save = useMutation({
-    mutationFn: async (form: Partial<Client>) => {
+    mutationFn: async (form: { nom: string; telephone: string | null; email: string | null; adresse: string | null; notes: string | null }) => {
       if (edit) {
         const { error } = await supabase.from("clients").update(form).eq("id", edit.id);
         if (error) throw error;
