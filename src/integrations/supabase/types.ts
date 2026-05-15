@@ -201,6 +201,7 @@ export type Database = {
       }
       paiements: {
         Row: {
+          categorie: string
           commande_id: string | null
           created_at: string
           date_paiement: string
@@ -211,6 +212,7 @@ export type Database = {
           source: string
         }
         Insert: {
+          categorie?: string
           commande_id?: string | null
           created_at?: string
           date_paiement?: string
@@ -221,6 +223,7 @@ export type Database = {
           source?: string
         }
         Update: {
+          categorie?: string
           commande_id?: string | null
           created_at?: string
           date_paiement?: string
