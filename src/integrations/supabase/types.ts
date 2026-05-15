@@ -109,6 +109,7 @@ export type Database = {
           id: string
           montant: number
           notes: string | null
+          source: string
         }
         Insert: {
           categorie?: string
@@ -118,6 +119,7 @@ export type Database = {
           id?: string
           montant: number
           notes?: string | null
+          source?: string
         }
         Update: {
           categorie?: string
@@ -127,6 +129,7 @@ export type Database = {
           id?: string
           montant?: number
           notes?: string | null
+          source?: string
         }
         Relationships: []
       }
@@ -205,6 +208,7 @@ export type Database = {
           methode: string
           montant: number
           notes: string | null
+          source: string
         }
         Insert: {
           commande_id?: string | null
@@ -214,6 +218,7 @@ export type Database = {
           methode?: string
           montant: number
           notes?: string | null
+          source?: string
         }
         Update: {
           commande_id?: string | null
@@ -223,6 +228,7 @@ export type Database = {
           methode?: string
           montant?: number
           notes?: string | null
+          source?: string
         }
         Relationships: [
           {

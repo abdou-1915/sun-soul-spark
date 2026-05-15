@@ -32,6 +32,14 @@ export type Paiement = {
   methode: "especes" | "virement" | "cheque" | "carte";
   date_paiement: string;
   notes: string | null;
+  source: Source;
+};
+
+export type Source = "atelier" | "boutique";
+
+export const SOURCE_LABELS: Record<Source, string> = {
+  atelier: "Atelier",
+  boutique: "Boutique",
 };
 
 export type Depense = {
@@ -41,6 +49,7 @@ export type Depense = {
   montant: number;
   date_depense: string;
   notes: string | null;
+  source: Source;
 };
 
 export type Materiau = {
