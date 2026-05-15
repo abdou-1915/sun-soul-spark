@@ -78,6 +78,47 @@ export const TYPE_LABELS: Record<CommandeType, string> = {
   autre: "Autre",
 };
 
+export type Produit = {
+  id: string;
+  nom: string;
+  categorie: "telephone" | "accessoire" | "ecouteur" | "chargeur" | "coque" | "autre";
+  marque: string | null;
+  code_barre: string | null;
+  prix_achat: number;
+  prix_vente: number;
+  stock: number;
+  seuil_alerte: number;
+  notes: string | null;
+};
+
+export type Vente = {
+  id: string;
+  client_id: string | null;
+  date_vente: string;
+  total: number;
+  methode_paiement: "especes" | "carte" | "virement" | "cheque";
+  notes: string | null;
+  created_at: string;
+};
+
+export type VenteItem = {
+  id: string;
+  vente_id: string;
+  produit_id: string | null;
+  nom_produit: string;
+  quantite: number;
+  prix_unitaire: number;
+};
+
+export const CATEGORIE_LABELS: Record<Produit["categorie"], string> = {
+  telephone: "Téléphone",
+  accessoire: "Accessoire",
+  ecouteur: "Écouteur",
+  chargeur: "Chargeur",
+  coque: "Coque",
+  autre: "Autre",
+};
+
 export const formatMoney = (n: number) =>
   new Intl.NumberFormat("fr-DZ", { style: "currency", currency: "DZD", maximumFractionDigits: 0 }).format(n);
 

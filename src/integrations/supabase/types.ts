@@ -234,6 +234,119 @@ export type Database = {
           },
         ]
       }
+      produits: {
+        Row: {
+          categorie: string
+          code_barre: string | null
+          created_at: string
+          id: string
+          marque: string | null
+          nom: string
+          notes: string | null
+          prix_achat: number
+          prix_vente: number
+          seuil_alerte: number
+          stock: number
+          updated_at: string
+        }
+        Insert: {
+          categorie?: string
+          code_barre?: string | null
+          created_at?: string
+          id?: string
+          marque?: string | null
+          nom: string
+          notes?: string | null
+          prix_achat?: number
+          prix_vente?: number
+          seuil_alerte?: number
+          stock?: number
+          updated_at?: string
+        }
+        Update: {
+          categorie?: string
+          code_barre?: string | null
+          created_at?: string
+          id?: string
+          marque?: string | null
+          nom?: string
+          notes?: string | null
+          prix_achat?: number
+          prix_vente?: number
+          seuil_alerte?: number
+          stock?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      vente_items: {
+        Row: {
+          created_at: string
+          id: string
+          nom_produit: string
+          prix_unitaire: number
+          produit_id: string | null
+          quantite: number
+          vente_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          nom_produit: string
+          prix_unitaire?: number
+          produit_id?: string | null
+          quantite?: number
+          vente_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          nom_produit?: string
+          prix_unitaire?: number
+          produit_id?: string | null
+          quantite?: number
+          vente_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vente_items_vente_id_fkey"
+            columns: ["vente_id"]
+            isOneToOne: false
+            referencedRelation: "ventes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ventes: {
+        Row: {
+          client_id: string | null
+          created_at: string
+          date_vente: string
+          id: string
+          methode_paiement: string
+          notes: string | null
+          total: number
+        }
+        Insert: {
+          client_id?: string | null
+          created_at?: string
+          date_vente?: string
+          id?: string
+          methode_paiement?: string
+          notes?: string | null
+          total?: number
+        }
+        Update: {
+          client_id?: string | null
+          created_at?: string
+          date_vente?: string
+          id?: string
+          methode_paiement?: string
+          notes?: string | null
+          total?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
