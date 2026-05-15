@@ -12,15 +12,17 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, Trash2, TrendingUp, TrendingDown, Wallet, Wrench, ShoppingCart } from "lucide-react";
+import { Plus, Trash2, TrendingUp, TrendingDown, Wallet, Wrench, ShoppingCart, ArrowDownToLine, ArrowUpFromLine, HandCoins, UserMinus, PiggyBank } from "lucide-react";
 import { toast } from "sonner";
-import { type Paiement, type Depense, type Commande, type Vente, type Source, formatMoney, formatDate, SOURCE_LABELS } from "@/lib/types";
+import {
+  type Paiement, type Depense, type Commande, type Vente, type Source,
+  type PaiementCategorie, type DepenseCategorie,
+  formatMoney, formatDate, SOURCE_LABELS,
+  PAIEMENT_CATEGORIE_LABELS, DEPENSE_CATEGORIE_LABELS,
+} from "@/lib/types";
 
 export const Route = createFileRoute("/finances")({ component: FinancesPage });
 
-const CATEGORIES: Record<Depense["categorie"], string> = {
-  materiaux: "Matériaux", electricite: "Électricité", loyer: "Loyer", salaire: "Salaire", transport: "Transport", autre: "Autre",
-};
 const METHODES = { especes: "Espèces", virement: "Virement", cheque: "Chèque", carte: "Carte" } as const;
 
 type SourceFilter = "tout" | Source;
@@ -34,7 +36,6 @@ function FinancesPage() {
   const { data: commandes = [] } = useQuery({ queryKey: ["commandes-finances"], queryFn: async () => (await supabase.from("commandes").select("id,titre,prix_total")).data as Pick<Commande, "id" | "titre" | "prix_total">[] });
   const { data: ventes = [] } = useQuery({ queryKey: ["ventes-finances"], queryFn: async () => (await supabase.from("ventes").select("*").order("date_vente", { ascending: false })).data as Vente[] });
 
-  // Calcul par caisse
   const caisses = useMemo(() => {
     const atelierIn = paiements.filter(p => p.source === "atelier").reduce((s, p) => s + Number(p.montant), 0);
     const atelierOut = depenses.filter(d => d.source === "atelier").reduce((s, d) => s + Number(d.montant), 0);
@@ -47,93 +48,175 @@ function FinancesPage() {
     };
   }, [paiements, depenses, ventes]);
 
-  const filteredPaiements = filter === "tout" ? paiements : paiements.filter(p => p.source === filter);
-  const filteredDepenses = filter === "tout" ? depenses : depenses.filter(d => d.source === filter);
+  const fp = filter === "tout" ? paiements : paiements.filter(p => p.source === filter);
+  const fd = filter === "tout" ? depenses : depenses.filter(d => d.source === filter);
+
+  // Sous-catégories
+  const entrees = fp;
+  const sorties = fd.filter(d => !["dette_payee", "pret_accorde", "prelevement_personnel", "retrait"].includes(d.categorie));
+  const retraits = fd.filter(d => d.categorie === "retrait");
+  const prelevements = fd.filter(d => d.categorie === "prelevement_personnel");
+  const apports = fp.filter(p => p.categorie === "apport");
+
+  // Dettes (somme nette)
+  const detteRecue = fp.filter(p => p.categorie === "dette_recue").reduce((s, p) => s + Number(p.montant), 0);
+  const dettePayee = fd.filter(d => d.categorie === "dette_payee").reduce((s, d) => s + Number(d.montant), 0);
+  const pretAccorde = fd.filter(d => d.categorie === "pret_accorde").reduce((s, d) => s + Number(d.montant), 0);
+  const remboursementRecu = fp.filter(p => p.categorie === "remboursement_recu").reduce((s, p) => s + Number(p.montant), 0);
+  const dettesNetto = detteRecue - dettePayee; // ce que JE dois encore
+  const pretsNetto = pretAccorde - remboursementRecu; // ce qu'on ME doit encore
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Finances" description="Caisses séparées : Atelier et Boutique" />
+      <PageHeader title="Caisse & Finances" description="Toute la trésorerie en un seul endroit" />
 
-      {/* Caisses séparées */}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <CaisseCard title="Caisse Atelier" icon={<Wrench className="h-5 w-5" />} data={caisses.atelier} accent="bg-primary/15 text-primary" />
         <CaisseCard title="Caisse Boutique" icon={<ShoppingCart className="h-5 w-5" />} data={caisses.boutique} accent="bg-accent/30 text-accent-foreground" />
       </div>
 
-      {/* Filtre par source */}
       <div className="flex items-center gap-2">
-        <Label className="text-sm">Afficher :</Label>
+        <Label className="text-sm">Caisse :</Label>
         <Select value={filter} onValueChange={(v) => setFilter(v as SourceFilter)}>
           <SelectTrigger className="w-[200px]"><SelectValue /></SelectTrigger>
           <SelectContent>
             <SelectItem value="tout">Tout</SelectItem>
-            <SelectItem value="atelier">Atelier seulement</SelectItem>
-            <SelectItem value="boutique">Boutique seulement</SelectItem>
+            <SelectItem value="atelier">Atelier</SelectItem>
+            <SelectItem value="boutique">Boutique</SelectItem>
           </SelectContent>
         </Select>
       </div>
 
-      <Tabs defaultValue="paiements">
-        <TabsList><TabsTrigger value="paiements">Paiements</TabsTrigger><TabsTrigger value="depenses">Dépenses</TabsTrigger></TabsList>
+      <Tabs defaultValue="entrees" className="w-full">
+        <TabsList className="flex w-full flex-wrap h-auto">
+          <TabsTrigger value="entrees"><ArrowDownToLine className="h-4 w-4 mr-1" />Entrées</TabsTrigger>
+          <TabsTrigger value="sorties"><ArrowUpFromLine className="h-4 w-4 mr-1" />Dépenses</TabsTrigger>
+          <TabsTrigger value="retraits"><Wallet className="h-4 w-4 mr-1" />Retraits</TabsTrigger>
+          <TabsTrigger value="perso"><UserMinus className="h-4 w-4 mr-1" />Perso</TabsTrigger>
+          <TabsTrigger value="apports"><PiggyBank className="h-4 w-4 mr-1" />Apports</TabsTrigger>
+          <TabsTrigger value="dettes"><HandCoins className="h-4 w-4 mr-1" />Dettes</TabsTrigger>
+        </TabsList>
 
-        <TabsContent value="paiements" className="space-y-4">
+        <TabsContent value="entrees" className="space-y-4 mt-4">
           <PaiementForm commandes={commandes} onSaved={() => qc.invalidateQueries({ queryKey: ["paiements"] })} />
-          <Card><CardHeader><CardTitle className="text-base">Historique</CardTitle></CardHeader><CardContent className="space-y-2">
-            {filteredPaiements.map((p) => {
-              const cmd = commandes.find((c) => c.id === p.commande_id);
-              return (
-                <div key={p.id} className="flex items-center justify-between rounded-lg border p-3">
-                  <div>
-                    <p className="font-medium">{cmd?.titre ?? "Paiement libre"}</p>
-                    <p className="text-xs text-muted-foreground flex flex-wrap items-center gap-1">
-                      {formatDate(p.date_paiement)} ·
-                      <Badge variant="outline">{METHODES[p.methode]}</Badge>
-                      <Badge variant={p.source === "boutique" ? "secondary" : "default"}>{SOURCE_LABELS[p.source]}</Badge>
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="font-bold text-success">+{formatMoney(Number(p.montant))}</span>
-                    <Button size="icon" variant="ghost" onClick={async () => {
-                      if (!confirm("Supprimer ?")) return;
-                      await supabase.from("paiements").delete().eq("id", p.id);
-                      qc.invalidateQueries({ queryKey: ["paiements"] });
-                    }}><Trash2 className="h-4 w-4 text-destructive" /></Button>
-                  </div>
-                </div>
-              );
-            })}
-            {filteredPaiements.length === 0 && <p className="py-8 text-center text-muted-foreground">Aucun paiement</p>}
-          </CardContent></Card>
+          <PaiementList items={entrees} commandes={commandes} qc={qc} />
         </TabsContent>
 
-        <TabsContent value="depenses" className="space-y-4">
-          <DepenseForm onSaved={() => qc.invalidateQueries({ queryKey: ["depenses"] })} />
-          <Card><CardHeader><CardTitle className="text-base">Historique</CardTitle></CardHeader><CardContent className="space-y-2">
-            {filteredDepenses.map((d) => (
-              <div key={d.id} className="flex items-center justify-between rounded-lg border p-3">
-                <div>
-                  <p className="font-medium">{d.description}</p>
-                  <p className="text-xs text-muted-foreground flex flex-wrap items-center gap-1">
-                    {formatDate(d.date_depense)} ·
-                    <Badge variant="outline">{CATEGORIES[d.categorie]}</Badge>
-                    <Badge variant={d.source === "boutique" ? "secondary" : "default"}>{SOURCE_LABELS[d.source]}</Badge>
-                  </p>
+        <TabsContent value="sorties" className="space-y-4 mt-4">
+          <DepenseForm defaultCat="autre" label="Ajouter une dépense" onSaved={() => qc.invalidateQueries({ queryKey: ["depenses"] })} />
+          <DepenseList items={sorties} qc={qc} />
+        </TabsContent>
+
+        <TabsContent value="retraits" className="space-y-4 mt-4">
+          <DepenseForm defaultCat="retrait" label="Ajouter un retrait" onSaved={() => qc.invalidateQueries({ queryKey: ["depenses"] })} />
+          <DepenseList items={retraits} qc={qc} />
+        </TabsContent>
+
+        <TabsContent value="perso" className="space-y-4 mt-4">
+          <DepenseForm defaultCat="prelevement_personnel" label="Prélèvement personnel" onSaved={() => qc.invalidateQueries({ queryKey: ["depenses"] })} />
+          <DepenseList items={prelevements} qc={qc} />
+        </TabsContent>
+
+        <TabsContent value="apports" className="space-y-4 mt-4">
+          <PaiementForm commandes={commandes} defaultCat="apport" label="Ajouter un apport" onSaved={() => qc.invalidateQueries({ queryKey: ["paiements"] })} />
+          <PaiementList items={apports} commandes={commandes} qc={qc} />
+        </TabsContent>
+
+        <TabsContent value="dettes" className="space-y-4 mt-4">
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+            <Card><CardContent className="p-4">
+              <p className="text-xs uppercase text-muted-foreground">Je dois (emprunté)</p>
+              <p className="text-2xl font-bold text-destructive">{formatMoney(Math.max(0, dettesNetto))}</p>
+              <p className="text-xs text-muted-foreground">Reçu {formatMoney(detteRecue)} · Payé {formatMoney(dettePayee)}</p>
+            </CardContent></Card>
+            <Card><CardContent className="p-4">
+              <p className="text-xs uppercase text-muted-foreground">On me doit (prêté)</p>
+              <p className="text-2xl font-bold text-success">{formatMoney(Math.max(0, pretsNetto))}</p>
+              <p className="text-xs text-muted-foreground">Prêté {formatMoney(pretAccorde)} · Remboursé {formatMoney(remboursementRecu)}</p>
+            </CardContent></Card>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <PaiementForm commandes={commandes} defaultCat="dette_recue" label="J'ai emprunté" onSaved={() => qc.invalidateQueries({ queryKey: ["paiements"] })} />
+            <DepenseForm defaultCat="dette_payee" label="J'ai remboursé" onSaved={() => qc.invalidateQueries({ queryKey: ["depenses"] })} />
+            <DepenseForm defaultCat="pret_accorde" label="J'ai prêté" onSaved={() => qc.invalidateQueries({ queryKey: ["depenses"] })} />
+            <PaiementForm commandes={commandes} defaultCat="remboursement_recu" label="On m'a remboursé" onSaved={() => qc.invalidateQueries({ queryKey: ["paiements"] })} />
+          </div>
+          <Card><CardHeader><CardTitle className="text-base">Mouvements de dettes</CardTitle></CardHeader><CardContent className="space-y-2">
+            {[...fp.filter(p => p.categorie === "dette_recue" || p.categorie === "remboursement_recu").map(p => ({ ...p, _kind: "in" as const })),
+              ...fd.filter(d => d.categorie === "dette_payee" || d.categorie === "pret_accorde").map(d => ({ ...d, _kind: "out" as const }))]
+              .sort((a, b) => ("date_paiement" in b ? b.date_paiement : b.date_depense).localeCompare("date_paiement" in a ? a.date_paiement : a.date_depense))
+              .map((it: any) => (
+                <div key={it.id} className="flex items-center justify-between rounded-lg border p-3">
+                  <div>
+                    <p className="font-medium">{"description" in it ? it.description : (PAIEMENT_CATEGORIE_LABELS[it.categorie as PaiementCategorie])}</p>
+                    <p className="text-xs text-muted-foreground">{formatDate(it._kind === "in" ? it.date_paiement : it.date_depense)} · <Badge variant="outline">{it._kind === "in" ? PAIEMENT_CATEGORIE_LABELS[it.categorie as PaiementCategorie] : DEPENSE_CATEGORIE_LABELS[it.categorie as DepenseCategorie]}</Badge></p>
+                  </div>
+                  <span className={`font-bold ${it._kind === "in" ? "text-success" : "text-destructive"}`}>{it._kind === "in" ? "+" : "-"}{formatMoney(Number(it.montant))}</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="font-bold text-destructive">-{formatMoney(Number(d.montant))}</span>
-                  <Button size="icon" variant="ghost" onClick={async () => {
-                    if (!confirm("Supprimer ?")) return;
-                    await supabase.from("depenses").delete().eq("id", d.id);
-                    qc.invalidateQueries({ queryKey: ["depenses"] });
-                  }}><Trash2 className="h-4 w-4 text-destructive" /></Button>
-                </div>
-              </div>
-            ))}
-            {filteredDepenses.length === 0 && <p className="py-8 text-center text-muted-foreground">Aucune dépense</p>}
+              ))}
           </CardContent></Card>
         </TabsContent>
       </Tabs>
     </div>
+  );
+}
+
+function PaiementList({ items, commandes, qc }: { items: Paiement[]; commandes: Pick<Commande, "id" | "titre" | "prix_total">[]; qc: ReturnType<typeof useQueryClient> }) {
+  return (
+    <Card><CardHeader><CardTitle className="text-base">Historique</CardTitle></CardHeader><CardContent className="space-y-2">
+      {items.map((p) => {
+        const cmd = commandes.find((c) => c.id === p.commande_id);
+        return (
+          <div key={p.id} className="flex items-center justify-between rounded-lg border p-3">
+            <div className="min-w-0">
+              <p className="font-medium truncate">{cmd?.titre ?? PAIEMENT_CATEGORIE_LABELS[p.categorie] ?? "Entrée"}</p>
+              <p className="text-xs text-muted-foreground flex flex-wrap items-center gap-1">
+                {formatDate(p.date_paiement)} ·
+                <Badge variant="outline">{PAIEMENT_CATEGORIE_LABELS[p.categorie]}</Badge>
+                <Badge variant={p.source === "boutique" ? "secondary" : "default"}>{SOURCE_LABELS[p.source]}</Badge>
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="font-bold text-success">+{formatMoney(Number(p.montant))}</span>
+              <Button size="icon" variant="ghost" onClick={async () => {
+                if (!confirm("Supprimer ?")) return;
+                await supabase.from("paiements").delete().eq("id", p.id);
+                qc.invalidateQueries({ queryKey: ["paiements"] });
+              }}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+            </div>
+          </div>
+        );
+      })}
+      {items.length === 0 && <p className="py-8 text-center text-muted-foreground">Aucune entrée</p>}
+    </CardContent></Card>
+  );
+}
+
+function DepenseList({ items, qc }: { items: Depense[]; qc: ReturnType<typeof useQueryClient> }) {
+  return (
+    <Card><CardHeader><CardTitle className="text-base">Historique</CardTitle></CardHeader><CardContent className="space-y-2">
+      {items.map((d) => (
+        <div key={d.id} className="flex items-center justify-between rounded-lg border p-3">
+          <div className="min-w-0">
+            <p className="font-medium truncate">{d.description}</p>
+            <p className="text-xs text-muted-foreground flex flex-wrap items-center gap-1">
+              {formatDate(d.date_depense)} ·
+              <Badge variant="outline">{DEPENSE_CATEGORIE_LABELS[d.categorie] ?? d.categorie}</Badge>
+              <Badge variant={d.source === "boutique" ? "secondary" : "default"}>{SOURCE_LABELS[d.source]}</Badge>
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="font-bold text-destructive">-{formatMoney(Number(d.montant))}</span>
+            <Button size="icon" variant="ghost" onClick={async () => {
+              if (!confirm("Supprimer ?")) return;
+              await supabase.from("depenses").delete().eq("id", d.id);
+              qc.invalidateQueries({ queryKey: ["depenses"] });
+            }}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+          </div>
+        </div>
+      ))}
+      {items.length === 0 && <p className="py-8 text-center text-muted-foreground">Aucune dépense</p>}
+    </CardContent></Card>
   );
 }
 
@@ -155,18 +238,18 @@ function CaisseCard({ title, icon, data, accent }: { title: string; icon: React.
   );
 }
 
-function PaiementForm({ commandes, onSaved }: { commandes: Pick<Commande, "id" | "titre" | "prix_total">[]; onSaved: () => void }) {
+function PaiementForm({ commandes, onSaved, defaultCat = "vente", label = "Ajouter une entrée" }: { commandes: Pick<Commande, "id" | "titre" | "prix_total">[]; onSaved: () => void; defaultCat?: PaiementCategorie; label?: string }) {
   const [open, setOpen] = useState(false);
   const m = useMutation({
     mutationFn: async (form: any) => { const { error } = await supabase.from("paiements").insert(form); if (error) throw error; },
-    onSuccess: () => { setOpen(false); onSaved(); toast.success("Paiement enregistré"); },
+    onSuccess: () => { setOpen(false); onSaved(); toast.success("Enregistré"); },
     onError: (e: any) => toast.error(e.message),
   });
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild><Button><Plus className="h-4 w-4" />Ajouter un paiement</Button></DialogTrigger>
+      <DialogTrigger asChild><Button size="sm"><Plus className="h-4 w-4" />{label}</Button></DialogTrigger>
       <DialogContent>
-        <DialogHeader><DialogTitle>Nouveau paiement</DialogTitle></DialogHeader>
+        <DialogHeader><DialogTitle>{label}</DialogTitle></DialogHeader>
         <form onSubmit={(e) => {
           e.preventDefault();
           const fd = new FormData(e.currentTarget);
@@ -175,20 +258,26 @@ function PaiementForm({ commandes, onSaved }: { commandes: Pick<Commande, "id" |
             montant: Number(fd.get("montant")),
             methode: fd.get("methode") || "especes",
             source: fd.get("source") || "atelier",
+            categorie: fd.get("categorie") || defaultCat,
             date_paiement: fd.get("date_paiement") || new Date().toISOString().slice(0, 10),
             notes: String(fd.get("notes") || "") || null,
           });
         }} className="space-y-3">
-          <div><Label>Caisse *</Label>
-            <Select name="source" defaultValue="atelier">
-              <SelectTrigger><SelectValue /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="atelier">Atelier</SelectItem>
-                <SelectItem value="boutique">Boutique</SelectItem>
-              </SelectContent>
-            </Select>
+          <div className="grid grid-cols-2 gap-3">
+            <div><Label>Caisse *</Label>
+              <Select name="source" defaultValue="atelier">
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent><SelectItem value="atelier">Atelier</SelectItem><SelectItem value="boutique">Boutique</SelectItem></SelectContent>
+              </Select>
+            </div>
+            <div><Label>Catégorie *</Label>
+              <Select name="categorie" defaultValue={defaultCat}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>{Object.entries(PAIEMENT_CATEGORIE_LABELS).map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}</SelectContent>
+              </Select>
+            </div>
           </div>
-          <div><Label>Commande (atelier)</Label>
+          <div><Label>Commande liée (optionnel)</Label>
             <Select name="commande_id" defaultValue="none">
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
@@ -214,49 +303,49 @@ function PaiementForm({ commandes, onSaved }: { commandes: Pick<Commande, "id" |
   );
 }
 
-function DepenseForm({ onSaved }: { onSaved: () => void }) {
+function DepenseForm({ onSaved, defaultCat = "autre", label = "Ajouter une dépense" }: { onSaved: () => void; defaultCat?: DepenseCategorie; label?: string }) {
   const [open, setOpen] = useState(false);
   const m = useMutation({
     mutationFn: async (form: any) => { const { error } = await supabase.from("depenses").insert(form); if (error) throw error; },
-    onSuccess: () => { setOpen(false); onSaved(); toast.success("Dépense enregistrée"); },
+    onSuccess: () => { setOpen(false); onSaved(); toast.success("Enregistré"); },
     onError: (e: any) => toast.error(e.message),
   });
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild><Button><Plus className="h-4 w-4" />Ajouter une dépense</Button></DialogTrigger>
+      <DialogTrigger asChild><Button size="sm" variant={defaultCat === "autre" ? "default" : "outline"}><Plus className="h-4 w-4" />{label}</Button></DialogTrigger>
       <DialogContent>
-        <DialogHeader><DialogTitle>Nouvelle dépense</DialogTitle></DialogHeader>
+        <DialogHeader><DialogTitle>{label}</DialogTitle></DialogHeader>
         <form onSubmit={(e) => {
           e.preventDefault();
           const fd = new FormData(e.currentTarget);
           m.mutate({
             description: String(fd.get("description")).trim(),
-            categorie: fd.get("categorie") || "autre",
+            categorie: fd.get("categorie") || defaultCat,
             montant: Number(fd.get("montant")),
             source: fd.get("source") || "atelier",
             date_depense: fd.get("date_depense") || new Date().toISOString().slice(0, 10),
             notes: String(fd.get("notes") || "") || null,
           });
         }} className="space-y-3">
-          <div><Label>Caisse *</Label>
-            <Select name="source" defaultValue="atelier">
-              <SelectTrigger><SelectValue /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="atelier">Atelier</SelectItem>
-                <SelectItem value="boutique">Boutique</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div><Label>Description *</Label><Input name="description" required /></div>
           <div className="grid grid-cols-2 gap-3">
-            <div><Label>Catégorie</Label>
-              <Select name="categorie" defaultValue="autre"><SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>{Object.entries(CATEGORIES).map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}</SelectContent>
+            <div><Label>Caisse *</Label>
+              <Select name="source" defaultValue="atelier">
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent><SelectItem value="atelier">Atelier</SelectItem><SelectItem value="boutique">Boutique</SelectItem></SelectContent>
               </Select>
             </div>
-            <div><Label>Montant *</Label><Input name="montant" type="number" step="0.01" required /></div>
+            <div><Label>Catégorie *</Label>
+              <Select name="categorie" defaultValue={defaultCat}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>{Object.entries(DEPENSE_CATEGORIE_LABELS).map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}</SelectContent>
+              </Select>
+            </div>
           </div>
-          <div><Label>Date</Label><Input type="date" name="date_depense" defaultValue={new Date().toISOString().slice(0, 10)} /></div>
+          <div><Label>Description *</Label><Input name="description" required defaultValue={DEPENSE_CATEGORIE_LABELS[defaultCat]} /></div>
+          <div className="grid grid-cols-2 gap-3">
+            <div><Label>Montant *</Label><Input name="montant" type="number" step="0.01" required /></div>
+            <div><Label>Date</Label><Input type="date" name="date_depense" defaultValue={new Date().toISOString().slice(0, 10)} /></div>
+          </div>
           <div><Label>Notes</Label><Textarea name="notes" rows={2} /></div>
           <DialogFooter><Button type="submit" disabled={m.isPending}>Enregistrer</Button></DialogFooter>
         </form>

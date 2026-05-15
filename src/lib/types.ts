@@ -25,6 +25,8 @@ export type Commande = {
   created_at: string;
 };
 
+export type PaiementCategorie = "vente" | "apport" | "remboursement_recu" | "dette_recue" | "autre";
+
 export type Paiement = {
   id: string;
   commande_id: string | null;
@@ -33,6 +35,7 @@ export type Paiement = {
   date_paiement: string;
   notes: string | null;
   source: Source;
+  categorie: PaiementCategorie;
 };
 
 export type Source = "atelier" | "boutique";
@@ -42,14 +45,39 @@ export const SOURCE_LABELS: Record<Source, string> = {
   boutique: "Boutique",
 };
 
+export const PAIEMENT_CATEGORIE_LABELS: Record<PaiementCategorie, string> = {
+  vente: "Vente / Commande",
+  apport: "Apport personnel",
+  remboursement_recu: "Remboursement reçu",
+  dette_recue: "Argent emprunté",
+  autre: "Autre entrée",
+};
+
+export type DepenseCategorie =
+  | "materiaux" | "electricite" | "loyer" | "salaire" | "transport"
+  | "retrait" | "prelevement_personnel" | "dette_payee" | "pret_accorde" | "autre";
+
 export type Depense = {
   id: string;
   description: string;
-  categorie: "materiaux" | "electricite" | "loyer" | "salaire" | "transport" | "autre";
+  categorie: DepenseCategorie;
   montant: number;
   date_depense: string;
   notes: string | null;
   source: Source;
+};
+
+export const DEPENSE_CATEGORIE_LABELS: Record<DepenseCategorie, string> = {
+  materiaux: "Matériaux",
+  electricite: "Électricité",
+  loyer: "Loyer",
+  salaire: "Salaire",
+  transport: "Transport",
+  retrait: "Retrait",
+  prelevement_personnel: "Prélèvement personnel",
+  dette_payee: "Dette remboursée",
+  pret_accorde: "Prêt accordé",
+  autre: "Autre",
 };
 
 export type Materiau = {
