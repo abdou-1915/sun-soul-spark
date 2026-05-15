@@ -1,0 +1,1 @@
+ALTER TABLE public.paiements ADD COLUMN IF NOT EXISTS categorie text NOT NULL DEFAULT 'vente';

@@ -7,6 +7,7 @@ import { formatMoney, formatDate, STATUT_LABELS, type Commande, type Paiement, t
 import { Users, ClipboardList, TrendingUp, TrendingDown, Wallet, AlertTriangle, Clock } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "@tanstack/react-router";
+import { QuickCommandeWidget, QuickFinanceWidget } from "@/components/quick-widgets";
 
 export const Route = createFileRoute("/")({ component: Dashboard });
 
@@ -71,6 +72,11 @@ function Dashboard() {
         <StatCard title="Bénéfice" value={formatMoney(benefice)} icon={Wallet} accent={benefice >= 0 ? "bg-success/15 text-success" : "bg-destructive/15 text-destructive"} />
         <StatCard title="Impayés" value={formatMoney(Math.max(0, impaye))} icon={Clock} accent="bg-warning/15 text-warning" />
         <StatCard title="Stock bas" value={`${stockBas.length} article${stockBas.length > 1 ? "s" : ""}`} icon={AlertTriangle} accent="bg-destructive/15 text-destructive" />
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <QuickCommandeWidget />
+        <QuickFinanceWidget />
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
