@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ParametresRouteImport } from './routes/parametres'
 import { Route as NotesRouteImport } from './routes/notes'
 import { Route as MateriauxRouteImport } from './routes/materiaux'
 import { Route as FinancesRouteImport } from './routes/finances'
@@ -18,6 +19,11 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as BoutiqueVentesRouteImport } from './routes/boutique.ventes'
 import { Route as BoutiqueProduitsRouteImport } from './routes/boutique.produits'
 
+const ParametresRoute = ParametresRouteImport.update({
+  id: '/parametres',
+  path: '/parametres',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const NotesRoute = NotesRouteImport.update({
   id: '/notes',
   path: '/notes',
@@ -66,6 +72,7 @@ export interface FileRoutesByFullPath {
   '/finances': typeof FinancesRoute
   '/materiaux': typeof MateriauxRoute
   '/notes': typeof NotesRoute
+  '/parametres': typeof ParametresRoute
   '/boutique/produits': typeof BoutiqueProduitsRoute
   '/boutique/ventes': typeof BoutiqueVentesRoute
 }
@@ -76,6 +83,7 @@ export interface FileRoutesByTo {
   '/finances': typeof FinancesRoute
   '/materiaux': typeof MateriauxRoute
   '/notes': typeof NotesRoute
+  '/parametres': typeof ParametresRoute
   '/boutique/produits': typeof BoutiqueProduitsRoute
   '/boutique/ventes': typeof BoutiqueVentesRoute
 }
@@ -87,6 +95,7 @@ export interface FileRoutesById {
   '/finances': typeof FinancesRoute
   '/materiaux': typeof MateriauxRoute
   '/notes': typeof NotesRoute
+  '/parametres': typeof ParametresRoute
   '/boutique/produits': typeof BoutiqueProduitsRoute
   '/boutique/ventes': typeof BoutiqueVentesRoute
 }
@@ -99,6 +108,7 @@ export interface FileRouteTypes {
     | '/finances'
     | '/materiaux'
     | '/notes'
+    | '/parametres'
     | '/boutique/produits'
     | '/boutique/ventes'
   fileRoutesByTo: FileRoutesByTo
@@ -109,6 +119,7 @@ export interface FileRouteTypes {
     | '/finances'
     | '/materiaux'
     | '/notes'
+    | '/parametres'
     | '/boutique/produits'
     | '/boutique/ventes'
   id:
@@ -119,6 +130,7 @@ export interface FileRouteTypes {
     | '/finances'
     | '/materiaux'
     | '/notes'
+    | '/parametres'
     | '/boutique/produits'
     | '/boutique/ventes'
   fileRoutesById: FileRoutesById
@@ -130,12 +142,20 @@ export interface RootRouteChildren {
   FinancesRoute: typeof FinancesRoute
   MateriauxRoute: typeof MateriauxRoute
   NotesRoute: typeof NotesRoute
+  ParametresRoute: typeof ParametresRoute
   BoutiqueProduitsRoute: typeof BoutiqueProduitsRoute
   BoutiqueVentesRoute: typeof BoutiqueVentesRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/parametres': {
+      id: '/parametres'
+      path: '/parametres'
+      fullPath: '/parametres'
+      preLoaderRoute: typeof ParametresRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/notes': {
       id: '/notes'
       path: '/notes'
@@ -202,6 +222,7 @@ const rootRouteChildren: RootRouteChildren = {
   FinancesRoute: FinancesRoute,
   MateriauxRoute: MateriauxRoute,
   NotesRoute: NotesRoute,
+  ParametresRoute: ParametresRoute,
   BoutiqueProduitsRoute: BoutiqueProduitsRoute,
   BoutiqueVentesRoute: BoutiqueVentesRoute,
 }
