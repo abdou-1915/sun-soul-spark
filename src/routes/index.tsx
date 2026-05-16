@@ -12,15 +12,17 @@ import { QuickCommandeWidget, QuickFinanceWidget } from "@/components/quick-widg
 export const Route = createFileRoute("/")({ component: Dashboard });
 
 function StatCard({ title, value, icon: Icon, accent }: { title: string; value: string; icon: any; accent?: string }) {
+  const len = value.length;
+  const sizeClass = len > 12 ? "text-sm" : len > 9 ? "text-base" : len > 7 ? "text-lg" : "text-xl";
   return (
     <Card>
-      <CardContent className="flex items-center gap-4 p-5">
-        <div className={`flex h-12 w-12 items-center justify-center rounded-lg ${accent ?? "bg-primary/10 text-primary"}`}>
-          <Icon className="h-6 w-6" />
+      <CardContent className="flex items-center gap-3 p-4 sm:gap-4 sm:p-5">
+        <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg sm:h-12 sm:w-12 ${accent ?? "bg-primary/10 text-primary"}`}>
+          <Icon className="h-5 w-5 sm:h-6 sm:w-6" />
         </div>
-        <div className="min-w-0">
-          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{title}</p>
-          <p className="mt-0.5 truncate text-xl font-bold text-foreground">{value}</p>
+        <div className="min-w-0 flex-1">
+          <p className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground sm:text-xs">{title}</p>
+          <p className={`mt-0.5 font-bold text-foreground break-words leading-tight ${sizeClass}`}>{value}</p>
         </div>
       </CardContent>
     </Card>
