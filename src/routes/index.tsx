@@ -3,8 +3,8 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageHeader } from "@/components/page-header";
-import { formatMoney, formatDate, STATUT_LABELS, type Commande, type Paiement, type Depense, type Materiau } from "@/lib/types";
-import { Users, ClipboardList, TrendingUp, TrendingDown, Wallet, AlertTriangle, Clock } from "lucide-react";
+import { formatMoney, formatDate, STATUT_LABELS, type Commande, type Paiement, type Depense, type Materiau, type Vente } from "@/lib/types";
+import { Users, ClipboardList, TrendingUp, TrendingDown, Wallet, AlertTriangle, Clock, Wrench, ShoppingCart } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "@tanstack/react-router";
 import { QuickCommandeWidget, QuickFinanceWidget } from "@/components/quick-widgets";
@@ -29,16 +29,41 @@ function StatCard({ title, value, icon: Icon, accent }: { title: string; value: 
   );
 }
 
+function CaisseSection({
+  title, icon: Icon, color, encaisse, depenses, extra,
+}: { title: string; icon: any; color: string; encaisse: number; depenses: number; extra?: { label: string; value: string } }) {
+  const solde = encaisse - depenses;
+  return (
+    <Card className="overflow-hidden">
+      <CardHeader className="pb-3">
+        <CardTitle className="flex items-center gap-2 text-base">
+          <span className={`flex h-8 w-8 items-center justify-center rounded-md ${color}`}>
+            <Icon className="h-4 w-4" />
+          </span>
+          {title}
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+        <StatCard title="Encaissé" value={formatMoney(encaisse)} icon={TrendingUp} accent="bg-success/15 text-success" />
+        <StatCard title="Dépenses" value={formatMoney(depenses)} icon={TrendingDown} accent="bg-destructive/15 text-destructive" />
+        <StatCard title="Solde" value={formatMoney(solde)} icon={Wallet} accent={solde >= 0 ? "bg-success/15 text-success" : "bg-destructive/15 text-destructive"} />
+        {extra && <StatCard title={extra.label} value={extra.value} icon={ClipboardList} accent="bg-warning/15 text-warning" />}
+      </CardContent>
+    </Card>
+  );
+}
+
 function Dashboard() {
   const { data } = useQuery({
     queryKey: ["dashboard"],
     queryFn: async () => {
-      const [c, cmd, pay, dep, mat] = await Promise.all([
+      const [c, cmd, pay, dep, mat, ven] = await Promise.all([
         supabase.from("clients").select("id", { count: "exact", head: true }),
         supabase.from("commandes").select("*").order("created_at", { ascending: false }),
         supabase.from("paiements").select("*"),
         supabase.from("depenses").select("*"),
         supabase.from("materiaux").select("*"),
+        supabase.from("ventes").select("*"),
       ]);
       return {
         nbClients: c.count ?? 0,
@@ -46,16 +71,31 @@ function Dashboard() {
         paiements: (pay.data ?? []) as Paiement[],
         depenses: (dep.data ?? []) as Depense[],
         materiaux: (mat.data ?? []) as Materiau[],
+        ventes: (ven.data ?? []) as Vente[],
       };
     },
   });
 
   const commandes = data?.commandes ?? [];
+  const paiements = data?.paiements ?? [];
+  const depenses = data?.depenses ?? [];
+  const ventes = data?.ventes ?? [];
+
+  const sumBy = <T extends { source: string; montant?: number; total?: number }>(arr: T[], src: string, key: "montant" | "total" = "montant") =>
+    arr.filter((x) => x.source === src).reduce((s, x) => s + Number((x as any)[key] ?? 0), 0);
+
+  const atelierIn = paiements.filter((p) => p.source === "atelier").reduce((s, p) => s + Number(p.montant), 0);
+  const atelierOut = sumBy(depenses, "atelier");
+  const boutiquePaiements = paiements.filter((p) => p.source === "boutique").reduce((s, p) => s + Number(p.montant), 0);
+  const boutiqueVentes = ventes.reduce((s, v) => s + Number(v.total), 0);
+  const boutiqueIn = boutiquePaiements + boutiqueVentes;
+  const boutiqueOut = sumBy(depenses, "boutique");
+
+  const totalIn = atelierIn + boutiqueIn;
+  const totalOut = atelierOut + boutiqueOut;
+  const benefice = totalIn - totalOut;
   const totalCA = commandes.reduce((s, c) => s + Number(c.prix_total), 0);
-  const totalPaye = (data?.paiements ?? []).reduce((s, p) => s + Number(p.montant), 0);
-  const totalDepenses = (data?.depenses ?? []).reduce((s, d) => s + Number(d.montant), 0);
-  const benefice = totalPaye - totalDepenses;
-  const impaye = totalCA - totalPaye;
+  const impaye = totalCA - paiements.reduce((s, p) => s + Number(p.montant), 0);
   const enCours = commandes.filter((c) => c.statut === "en_cours" || c.statut === "en_attente").length;
   const stockBas = (data?.materiaux ?? []).filter((m) => Number(m.quantite) <= Number(m.seuil_alerte));
 
@@ -66,14 +106,13 @@ function Dashboard() {
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
         <StatCard title="Clients" value={String(data?.nbClients ?? 0)} icon={Users} />
         <StatCard title="Commandes en cours" value={String(enCours)} icon={ClipboardList} accent="bg-warning/15 text-warning" />
-        <StatCard title="Encaissé" value={formatMoney(totalPaye)} icon={TrendingUp} accent="bg-success/15 text-success" />
-        <StatCard title="Dépenses" value={formatMoney(totalDepenses)} icon={TrendingDown} accent="bg-destructive/15 text-destructive" />
+        <StatCard title="Bénéfice total" value={formatMoney(benefice)} icon={Wallet} accent={benefice >= 0 ? "bg-success/15 text-success" : "bg-destructive/15 text-destructive"} />
+        <StatCard title="Impayés" value={formatMoney(Math.max(0, impaye))} icon={Clock} accent="bg-warning/15 text-warning" />
       </div>
 
-      <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
-        <StatCard title="Bénéfice" value={formatMoney(benefice)} icon={Wallet} accent={benefice >= 0 ? "bg-success/15 text-success" : "bg-destructive/15 text-destructive"} />
-        <StatCard title="Impayés" value={formatMoney(Math.max(0, impaye))} icon={Clock} accent="bg-warning/15 text-warning" />
-        <StatCard title="Stock bas" value={`${stockBas.length} article${stockBas.length > 1 ? "s" : ""}`} icon={AlertTriangle} accent="bg-destructive/15 text-destructive" />
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <CaisseSection title="Caisse Atelier" icon={Wrench} color="bg-primary/15 text-primary" encaisse={atelierIn} depenses={atelierOut} />
+        <CaisseSection title="Caisse Boutique" icon={ShoppingCart} color="bg-chart-3/15 text-chart-3" encaisse={boutiqueIn} depenses={boutiqueOut} />
       </div>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">

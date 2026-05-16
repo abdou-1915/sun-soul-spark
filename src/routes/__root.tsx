@@ -2,6 +2,7 @@ import { Outlet, Link, createRootRoute, HeadContent, Scripts } from "@tanstack/r
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { Providers } from "@/components/providers";
+import { ThemeToggle } from "@/components/theme-toggle";
 import appCss from "../styles.css?url";
 
 function NotFoundComponent() {
@@ -75,6 +76,7 @@ function RootComponent() {
             <header className="flex h-14 items-center gap-2 border-b border-border bg-card/50 px-4 backdrop-blur sticky top-0 z-10">
               <SidebarTrigger />
               <div className="ml-2 text-sm font-medium text-muted-foreground">Atelier Pro</div>
+              <div className="ml-auto"><ThemeToggle /></div>
             </header>
             <main className="flex-1 p-4 md:p-6 lg:p-8">
               <Outlet />
