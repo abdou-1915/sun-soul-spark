@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { LayoutDashboard, Users, ClipboardList, Wallet, Package, StickyNote, Wrench, Smartphone, ShoppingCart, Settings } from "lucide-react";
+import { LayoutDashboard, Users, ClipboardList, Wallet, Package, StickyNote, Wrench, Smartphone, ShoppingCart, Settings, HandCoins } from "lucide-react";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
   SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarHeader,
@@ -10,6 +10,7 @@ const items = [
   { title: "Clients", url: "/clients", icon: Users },
   { title: "Commandes", url: "/commandes", icon: ClipboardList },
   { title: "Finances", url: "/finances", icon: Wallet },
+  { title: "Dettes", url: "/dettes", icon: HandCoins },
   { title: "Matériaux", url: "/materiaux", icon: Package },
   { title: "Notes", url: "/notes", icon: StickyNote },
 ];
