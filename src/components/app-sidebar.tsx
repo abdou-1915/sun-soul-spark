@@ -1,8 +1,27 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { LayoutDashboard, Users, ClipboardList, Wallet, Package, StickyNote, Wrench, Smartphone, ShoppingCart, Settings, HandCoins } from "lucide-react";
 import {
-  Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
-  SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarHeader,
+  LayoutDashboard,
+  Users,
+  ClipboardList,
+  Wallet,
+  Package,
+  StickyNote,
+  Wrench,
+  Smartphone,
+  ShoppingCart,
+  Settings,
+  HandCoins,
+} from "lucide-react";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarHeader,
 } from "@/components/ui/sidebar";
 
 const items = [

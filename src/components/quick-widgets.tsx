@@ -5,19 +5,28 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { ClipboardList, Wallet, Plus } from "lucide-react";
 import { toast } from "sonner";
 import {
-  TYPE_LABELS, PAIEMENT_CATEGORIE_LABELS, DEPENSE_CATEGORIE_LABELS,
-  type PaiementCategorie, type DepenseCategorie,
+  TYPE_LABELS,
+  PAIEMENT_CATEGORIE_LABELS,
+  DEPENSE_CATEGORIE_LABELS,
+  type PaiementCategorie,
+  type DepenseCategorie,
 } from "@/lib/types";
 
 export function QuickCommandeWidget() {
   const qc = useQueryClient();
   const { data: clients = [] } = useQuery({
     queryKey: ["clients-quick"],
-    queryFn: () => clientsDb.list().map(c => ({ id: c.id, nom: c.nom })),
+    queryFn: () => clientsDb.list().map((c) => ({ id: c.id, nom: c.nom })),
   });
   const [titre, setTitre] = useState("");
   const [type, setType] = useState("autre");
@@ -41,7 +50,10 @@ export function QuickCommandeWidget() {
     },
     onSuccess: () => {
       toast.success("Commande créée");
-      setTitre(""); setPrix(""); setType("autre"); setClientId("none");
+      setTitre("");
+      setPrix("");
+      setType("autre");
+      setClientId("none");
       qc.invalidateQueries({ queryKey: ["dashboard"] });
       qc.invalidateQueries({ queryKey: ["commandes"] });
     },
@@ -59,36 +71,68 @@ export function QuickCommandeWidget() {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <form onSubmit={(e) => { e.preventDefault(); m.mutate(); }} className="space-y-3">
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            m.mutate();
+          }}
+          className="space-y-3"
+        >
           <div>
             <Label className="text-xs">Titre *</Label>
-            <Input value={titre} onChange={(e) => setTitre(e.target.value)} placeholder="Ex: Panneau publicitaire" required />
+            <Input
+              value={titre}
+              onChange={(e) => setTitre(e.target.value)}
+              placeholder="Ex: Panneau publicitaire"
+              required
+            />
           </div>
           <div className="grid grid-cols-2 gap-2">
             <div>
               <Label className="text-xs">Type</Label>
               <Select value={type} onValueChange={setType}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>{Object.entries(TYPE_LABELS).map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}</SelectContent>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.entries(TYPE_LABELS).map(([k, v]) => (
+                    <SelectItem key={k} value={k}>
+                      {v}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
               </Select>
             </div>
             <div>
               <Label className="text-xs">Prix</Label>
-              <Input type="number" step="0.01" value={prix} onChange={(e) => setPrix(e.target.value)} placeholder="0" />
+              <Input
+                type="number"
+                step="0.01"
+                value={prix}
+                onChange={(e) => setPrix(e.target.value)}
+                placeholder="0"
+              />
             </div>
           </div>
           <div>
             <Label className="text-xs">Client</Label>
             <Select value={clientId} onValueChange={setClientId}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
                 <SelectItem value="none">— Aucun —</SelectItem>
-                {clients.map((c) => <SelectItem key={c.id} value={c.id}>{c.nom}</SelectItem>)}
+                {clients.map((c) => (
+                  <SelectItem key={c.id} value={c.id}>
+                    {c.nom}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
           <Button type="submit" disabled={m.isPending} className="w-full" size="sm">
-            <Plus className="h-4 w-4" />Créer la commande
+            <Plus className="h-4 w-4" />
+            Créer la commande
           </Button>
         </form>
       </CardContent>
@@ -111,14 +155,19 @@ export function QuickFinanceWidget() {
       if (!v || v <= 0) throw new Error("Montant invalide");
       if (sens === "in") {
         paiementsDb.insert({
-          montant: v, source: source as any, categorie: catIn, methode: "especes",
+          montant: v,
+          source: source as any,
+          categorie: catIn,
+          methode: "especes",
           date_paiement: new Date().toISOString().slice(0, 10),
           commande_id: null,
           notes: description || null,
         });
       } else {
         depensesDb.insert({
-          montant: v, source: source as any, categorie: catOut,
+          montant: v,
+          source: source as any,
+          categorie: catOut,
           description: description.trim() || DEPENSE_CATEGORIE_LABELS[catOut],
           date_depense: new Date().toISOString().slice(0, 10),
           notes: null,
@@ -127,7 +176,8 @@ export function QuickFinanceWidget() {
     },
     onSuccess: () => {
       toast.success(sens === "in" ? "Entrée enregistrée" : "Sortie enregistrée");
-      setMontant(""); setDescription("");
+      setMontant("");
+      setDescription("");
       qc.invalidateQueries({ queryKey: ["dashboard"] });
       qc.invalidateQueries({ queryKey: ["paiements"] });
       qc.invalidateQueries({ queryKey: ["depenses"] });
@@ -146,44 +196,107 @@ export function QuickFinanceWidget() {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <form onSubmit={(e) => { e.preventDefault(); m.mutate(); }} className="space-y-3">
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            m.mutate();
+          }}
+          className="space-y-3"
+        >
           <div className="grid grid-cols-2 gap-2">
-            <Button type="button" size="sm" variant={sens === "in" ? "default" : "outline"} onClick={() => setSens("in")}>+ Entrée</Button>
-            <Button type="button" size="sm" variant={sens === "out" ? "destructive" : "outline"} onClick={() => setSens("out")}>− Sortie</Button>
+            <Button
+              type="button"
+              size="sm"
+              variant={sens === "in" ? "default" : "outline"}
+              onClick={() => setSens("in")}
+            >
+              + Entrée
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              variant={sens === "out" ? "destructive" : "outline"}
+              onClick={() => setSens("out")}
+            >
+              − Sortie
+            </Button>
           </div>
           <div className="grid grid-cols-2 gap-2">
             <div>
               <Label className="text-xs">Caisse</Label>
               <Select value={source} onValueChange={setSource}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent><SelectItem value="atelier">Atelier</SelectItem><SelectItem value="boutique">Boutique</SelectItem></SelectContent>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="atelier">Atelier</SelectItem>
+                  <SelectItem value="boutique">Boutique</SelectItem>
+                </SelectContent>
               </Select>
             </div>
             <div>
               <Label className="text-xs">Catégorie</Label>
               {sens === "in" ? (
                 <Select value={catIn} onValueChange={(v) => setCatIn(v as PaiementCategorie)}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>{Object.entries(PAIEMENT_CATEGORIE_LABELS).filter(([k]) => !["dette_recue", "remboursement_recu"].includes(k)).map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}</SelectContent>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.entries(PAIEMENT_CATEGORIE_LABELS)
+                      .filter(([k]) => !["dette_recue", "remboursement_recu"].includes(k))
+                      .map(([k, v]) => (
+                        <SelectItem key={k} value={k}>
+                          {v}
+                        </SelectItem>
+                      ))}
+                  </SelectContent>
                 </Select>
               ) : (
                 <Select value={catOut} onValueChange={(v) => setCatOut(v as DepenseCategorie)}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>{Object.entries(DEPENSE_CATEGORIE_LABELS).filter(([k]) => !["dette_payee", "pret_accorde"].includes(k)).map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}</SelectContent>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.entries(DEPENSE_CATEGORIE_LABELS)
+                      .filter(([k]) => !["dette_payee", "pret_accorde"].includes(k))
+                      .map(([k, v]) => (
+                        <SelectItem key={k} value={k}>
+                          {v}
+                        </SelectItem>
+                      ))}
+                  </SelectContent>
                 </Select>
               )}
             </div>
           </div>
           <div>
             <Label className="text-xs">Montant *</Label>
-            <Input type="number" step="0.01" value={montant} onChange={(e) => setMontant(e.target.value)} placeholder="0" required />
+            <Input
+              type="number"
+              step="0.01"
+              value={montant}
+              onChange={(e) => setMontant(e.target.value)}
+              placeholder="0"
+              required
+            />
           </div>
           <div>
             <Label className="text-xs">{sens === "in" ? "Note" : "Description"}</Label>
-            <Input value={description} onChange={(e) => setDescription(e.target.value)} placeholder={sens === "in" ? "Optionnel" : "Ex: facture électricité"} />
+            <Input
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder={sens === "in" ? "Optionnel" : "Ex: facture électricité"}
+            />
           </div>
-          <Button type="submit" disabled={m.isPending} className="w-full" size="sm" variant={sens === "out" ? "destructive" : "default"}>
-            <Plus className="h-4 w-4" />Enregistrer
+          <Button
+            type="submit"
+            disabled={m.isPending}
+            className="w-full"
+            size="sm"
+            variant={sens === "out" ? "destructive" : "default"}
+          >
+            <Plus className="h-4 w-4" />
+            Enregistrer
           </Button>
         </form>
       </CardContent>
