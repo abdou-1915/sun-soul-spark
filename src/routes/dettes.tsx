@@ -341,8 +341,8 @@ function DebtForm({
             const fd = new FormData(e.currentTarget);
             m.mutate({
               montant: Number(fd.get("montant")),
-              source: fd.get("source"),
-              date: fd.get("date"),
+              source: (fd.get("source") || "atelier") as Source,
+              date: String(fd.get("date") || new Date().toISOString().slice(0, 10)),
               note: String(fd.get("note") || ""),
             });
           }}
