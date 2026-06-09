@@ -71,6 +71,8 @@ type SourceFilter = "tout" | Source;
 
 const dettePaiementCategories: PaiementCategorie[] = ["dette_recue", "remboursement_recu"];
 const detteDepenseCategories: DepenseCategorie[] = ["dette_payee", "pret_accorde"];
+type PaiementFormData = Omit<Paiement, "id">;
+type DepenseFormData = Omit<Depense, "id">;
 
 function FinancesPage() {
   const qc = useQueryClient();
@@ -366,7 +368,7 @@ function PaiementForm({
 }) {
   const [open, setOpen] = useState(false);
   const m = useMutation({
-    mutationFn: async (form: any) => paiementsDb.insert(form),
+    mutationFn: async (form: PaiementFormData) => paiementsDb.insert(form),
     onSuccess: () => {
       setOpen(false);
       onSaved();
@@ -411,7 +413,7 @@ function DepenseForm({
 }) {
   const [open, setOpen] = useState(false);
   const m = useMutation({
-    mutationFn: async (form: any) => depensesDb.insert(form),
+    mutationFn: async (form: DepenseFormData) => depensesDb.insert(form),
     onSuccess: () => {
       setOpen(false);
       onSaved();
