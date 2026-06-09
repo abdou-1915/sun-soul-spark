@@ -34,17 +34,16 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { HandCoins, Plus, Pencil, Trash2, ArrowDownToLine, ArrowUpFromLine } from "lucide-react";
+import { HandCoins, Plus, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import {
   type Paiement,
   type Depense,
   type PaiementCategorie,
   type DepenseCategorie,
+  type Source,
   formatDate,
   formatMoney,
-  PAIEMENT_CATEGORIE_LABELS,
-  DEPENSE_CATEGORIE_LABELS,
   SOURCE_LABELS,
 } from "@/lib/types";
 
@@ -58,6 +57,13 @@ type DetteItem = {
   date: string;
   montant: number;
   source: "atelier" | "boutique";
+  note: string;
+};
+
+type DetteFormData = {
+  montant: number;
+  source: Source;
+  date: string;
   note: string;
 };
 
@@ -277,7 +283,7 @@ function DebtForm({
   const [open, setOpen] = useState(false);
   const isPaiement = type === "dette_recue" || type === "remboursement_recu";
   const m = useMutation({
-    mutationFn: async (form: any) => {
+    mutationFn: async (form: DetteFormData) => {
       if (isPaiement) {
         const payload: Partial<Paiement> = {
           montant: form.montant,
