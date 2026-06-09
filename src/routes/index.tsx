@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { clientsDb, commandesDb, paiementsDb, depensesDb, materiauxDb, ventesDb } from "@/lib/localdb";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageHeader } from "@/components/page-header";
-import { formatMoney, formatDate, STATUT_LABELS, type Commande, type Paiement, type Depense, type Materiau } from "@/lib/types";
+import { formatMoney, formatDate, STATUT_LABELS } from "@/lib/types";
 import { Users, ClipboardList, TrendingUp, TrendingDown, Wallet, Clock, Wrench, ShoppingCart } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "@tanstack/react-router";
@@ -13,16 +13,16 @@ export const Route = createFileRoute("/")({ component: Dashboard });
 
 function StatCard({ title, value, icon: Icon, accent }: { title: string; value: string; icon: any; accent?: string }) {
   const len = value.length;
-  const sizeClass = len > 12 ? "text-sm" : len > 9 ? "text-base" : len > 7 ? "text-lg" : "text-xl";
+  const sizeClass = len > 14 ? "text-[10px] sm:text-sm" : len > 10 ? "text-[11px] sm:text-base" : len > 7 ? "text-xs sm:text-lg" : "text-base sm:text-xl";
   return (
     <Card>
-      <CardContent className="flex items-center gap-3 p-4 sm:gap-4 sm:p-5">
-        <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg sm:h-12 sm:w-12 ${accent ?? "bg-primary/10 text-primary"}`}>
-          <Icon className="h-5 w-5 sm:h-6 sm:w-6" />
+      <CardContent className="flex items-center gap-2 p-3 sm:gap-4 sm:p-5">
+        <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg sm:h-12 sm:w-12 ${accent ?? "bg-primary/10 text-primary"}`}>
+          <Icon className="h-4 w-4 sm:h-6 sm:w-6" />
         </div>
         <div className="min-w-0 flex-1">
           <p className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground sm:text-xs">{title}</p>
-          <p className={`mt-0.5 font-bold text-foreground break-words leading-tight ${sizeClass}`}>{value}</p>
+          <p className={`mt-1 overflow-x-auto whitespace-nowrap font-bold leading-none text-foreground ${sizeClass}`}>{value}</p>
         </div>
       </CardContent>
     </Card>
@@ -66,11 +66,13 @@ function Dashboard() {
   const depenses = data?.depenses ?? [];
   const ventes = data?.ventes ?? [];
 
-  const atelierIn = paiements.filter(p => p.source === "atelier").reduce((s, p) => s + Number(p.montant), 0);
-  const atelierOut = depenses.filter(d => d.source === "atelier").reduce((s, d) => s + Number(d.montant), 0);
-  const boutiqueIn = paiements.filter(p => p.source === "boutique").reduce((s, p) => s + Number(p.montant), 0)
+  const caissePaiements = paiements.filter(p => !["dette_recue", "remboursement_recu"].includes(p.categorie));
+  const caisseDepenses = depenses.filter(d => !["dette_payee", "pret_accorde"].includes(d.categorie));
+  const atelierIn = caissePaiements.filter(p => p.source === "atelier").reduce((s, p) => s + Number(p.montant), 0);
+  const atelierOut = caisseDepenses.filter(d => d.source === "atelier").reduce((s, d) => s + Number(d.montant), 0);
+  const boutiqueIn = caissePaiements.filter(p => p.source === "boutique").reduce((s, p) => s + Number(p.montant), 0)
     + ventes.reduce((s, v) => s + Number(v.total), 0);
-  const boutiqueOut = depenses.filter(d => d.source === "boutique").reduce((s, d) => s + Number(d.montant), 0);
+  const boutiqueOut = caisseDepenses.filter(d => d.source === "boutique").reduce((s, d) => s + Number(d.montant), 0);
 
   const totalIn = atelierIn + boutiqueIn;
   const totalOut = atelierOut + boutiqueOut;
