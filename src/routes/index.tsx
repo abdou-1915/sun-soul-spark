@@ -21,6 +21,7 @@ import {
   Wrench,
   ShoppingCart,
 } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "@tanstack/react-router";
 import { QuickCommandeWidget, QuickFinanceWidget } from "@/components/quick-widgets";
@@ -35,7 +36,7 @@ function StatCard({
 }: {
   title: string;
   value: string;
-  icon: any;
+  icon: LucideIcon;
   accent?: string;
 }) {
   const len = value.length;
@@ -78,7 +79,7 @@ function CaisseSection({
   depenses,
 }: {
   title: string;
-  icon: any;
+  icon: LucideIcon;
   color: string;
   encaisse: number;
   depenses: number;
@@ -126,7 +127,7 @@ function CaisseMetric({
 }: {
   title: string;
   value: string;
-  icon: any;
+  icon: LucideIcon;
   accent: string;
 }) {
   return (
