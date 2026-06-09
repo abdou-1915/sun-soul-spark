@@ -164,12 +164,12 @@ export function QuickFinanceWidget() {
               {sens === "in" ? (
                 <Select value={catIn} onValueChange={(v) => setCatIn(v as PaiementCategorie)}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>{Object.entries(PAIEMENT_CATEGORIE_LABELS).map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}</SelectContent>
+                  <SelectContent>{Object.entries(PAIEMENT_CATEGORIE_LABELS).filter(([k]) => !["dette_recue", "remboursement_recu"].includes(k)).map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}</SelectContent>
                 </Select>
               ) : (
                 <Select value={catOut} onValueChange={(v) => setCatOut(v as DepenseCategorie)}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>{Object.entries(DEPENSE_CATEGORIE_LABELS).map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}</SelectContent>
+                  <SelectContent>{Object.entries(DEPENSE_CATEGORIE_LABELS).filter(([k]) => !["dette_payee", "pret_accorde"].includes(k)).map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}</SelectContent>
                 </Select>
               )}
             </div>
