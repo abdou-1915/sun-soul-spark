@@ -16,6 +16,8 @@ import { Route as FinancesRouteImport } from './routes/finances'
 import { Route as CommandesRouteImport } from './routes/commandes'
 import { Route as ClientsRouteImport } from './routes/clients'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as BoutiqueVentesRouteImport } from './routes/boutique.ventes'
+import { Route as BoutiqueProduitsRouteImport } from './routes/boutique.produits'
 
 const ParametresRoute = ParametresRouteImport.update({
   id: '/parametres',
@@ -52,6 +54,16 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BoutiqueVentesRoute = BoutiqueVentesRouteImport.update({
+  id: '/boutique/ventes',
+  path: '/boutique/ventes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BoutiqueProduitsRoute = BoutiqueProduitsRouteImport.update({
+  id: '/boutique/produits',
+  path: '/boutique/produits',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -61,6 +73,8 @@ export interface FileRoutesByFullPath {
   '/materiaux': typeof MateriauxRoute
   '/notes': typeof NotesRoute
   '/parametres': typeof ParametresRoute
+  '/boutique/produits': typeof BoutiqueProduitsRoute
+  '/boutique/ventes': typeof BoutiqueVentesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -70,6 +84,8 @@ export interface FileRoutesByTo {
   '/materiaux': typeof MateriauxRoute
   '/notes': typeof NotesRoute
   '/parametres': typeof ParametresRoute
+  '/boutique/produits': typeof BoutiqueProduitsRoute
+  '/boutique/ventes': typeof BoutiqueVentesRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -80,6 +96,8 @@ export interface FileRoutesById {
   '/materiaux': typeof MateriauxRoute
   '/notes': typeof NotesRoute
   '/parametres': typeof ParametresRoute
+  '/boutique/produits': typeof BoutiqueProduitsRoute
+  '/boutique/ventes': typeof BoutiqueVentesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -91,6 +109,8 @@ export interface FileRouteTypes {
     | '/materiaux'
     | '/notes'
     | '/parametres'
+    | '/boutique/produits'
+    | '/boutique/ventes'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -100,6 +120,8 @@ export interface FileRouteTypes {
     | '/materiaux'
     | '/notes'
     | '/parametres'
+    | '/boutique/produits'
+    | '/boutique/ventes'
   id:
     | '__root__'
     | '/'
@@ -109,6 +131,8 @@ export interface FileRouteTypes {
     | '/materiaux'
     | '/notes'
     | '/parametres'
+    | '/boutique/produits'
+    | '/boutique/ventes'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -119,6 +143,8 @@ export interface RootRouteChildren {
   MateriauxRoute: typeof MateriauxRoute
   NotesRoute: typeof NotesRoute
   ParametresRoute: typeof ParametresRoute
+  BoutiqueProduitsRoute: typeof BoutiqueProduitsRoute
+  BoutiqueVentesRoute: typeof BoutiqueVentesRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -172,6 +198,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/boutique/ventes': {
+      id: '/boutique/ventes'
+      path: '/boutique/ventes'
+      fullPath: '/boutique/ventes'
+      preLoaderRoute: typeof BoutiqueVentesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/boutique/produits': {
+      id: '/boutique/produits'
+      path: '/boutique/produits'
+      fullPath: '/boutique/produits'
+      preLoaderRoute: typeof BoutiqueProduitsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -183,6 +223,8 @@ const rootRouteChildren: RootRouteChildren = {
   MateriauxRoute: MateriauxRoute,
   NotesRoute: NotesRoute,
   ParametresRoute: ParametresRoute,
+  BoutiqueProduitsRoute: BoutiqueProduitsRoute,
+  BoutiqueVentesRoute: BoutiqueVentesRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
