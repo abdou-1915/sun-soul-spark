@@ -74,6 +74,10 @@ export const paiementsDb = {
     save("paiements", [item, ...rows]);
     return item;
   },
+  update(id: string, form: Partial<Paiement>) {
+    const rows = load<Paiement>("paiements").map(r => r.id === id ? { ...r, ...form } : r);
+    save("paiements", rows);
+  },
   delete(id: string) {
     save("paiements", load<Paiement>("paiements").filter(r => r.id !== id));
   },
@@ -89,6 +93,10 @@ export const depensesDb = {
     const item: Depense = { ...form, id: uid() };
     save("depenses", [item, ...rows]);
     return item;
+  },
+  update(id: string, form: Partial<Depense>) {
+    const rows = load<Depense>("depenses").map(r => r.id === id ? { ...r, ...form } : r);
+    save("depenses", rows);
   },
   delete(id: string) {
     save("depenses", load<Depense>("depenses").filter(r => r.id !== id));
