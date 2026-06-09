@@ -18,6 +18,8 @@ import {
   TYPE_LABELS,
   PAIEMENT_CATEGORIE_LABELS,
   DEPENSE_CATEGORIE_LABELS,
+  type CommandeType,
+  type Source,
   type PaiementCategorie,
   type DepenseCategorie,
 } from "@/lib/types";
@@ -38,7 +40,7 @@ export function QuickCommandeWidget() {
       if (!titre.trim()) throw new Error("Titre requis");
       commandesDb.insert({
         titre: titre.trim(),
-        type: type as any,
+        type: type as CommandeType,
         prix_total: Number(prix) || 0,
         client_id: clientId === "none" ? null : clientId,
         statut: "en_attente",
@@ -57,7 +59,7 @@ export function QuickCommandeWidget() {
       qc.invalidateQueries({ queryKey: ["dashboard"] });
       qc.invalidateQueries({ queryKey: ["commandes"] });
     },
-    onError: (e: any) => toast.error(e.message),
+    onError: (e: Error) => toast.error(e.message),
   });
 
   return (
@@ -156,7 +158,7 @@ export function QuickFinanceWidget() {
       if (sens === "in") {
         paiementsDb.insert({
           montant: v,
-          source: source as any,
+          source: source as Source,
           categorie: catIn,
           methode: "especes",
           date_paiement: new Date().toISOString().slice(0, 10),
@@ -166,7 +168,7 @@ export function QuickFinanceWidget() {
       } else {
         depensesDb.insert({
           montant: v,
-          source: source as any,
+          source: source as Source,
           categorie: catOut,
           description: description.trim() || DEPENSE_CATEGORIE_LABELS[catOut],
           date_depense: new Date().toISOString().slice(0, 10),
@@ -182,7 +184,7 @@ export function QuickFinanceWidget() {
       qc.invalidateQueries({ queryKey: ["paiements"] });
       qc.invalidateQueries({ queryKey: ["depenses"] });
     },
-    onError: (e: any) => toast.error(e.message),
+    onError: (e: Error) => toast.error(e.message),
   });
 
   return (
