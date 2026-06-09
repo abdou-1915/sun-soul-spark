@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState, useMemo } from "react";
+import { useState, useMemo, type ReactNode } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { paiementsDb, depensesDb, ventesDb } from "@/lib/localdb";
 import { PageHeader } from "@/components/page-header";
@@ -14,6 +14,7 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Plus, Trash2, TrendingUp, TrendingDown, Wallet, Wrench, ShoppingCart, ArrowDownToLine, ArrowUpFromLine } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -181,7 +182,7 @@ function DeleteButton({ title, onConfirm }: { title: string; onConfirm: () => vo
   );
 }
 
-function CaisseCard({ title, icon, data, accent }: { title: string; icon: React.ReactNode; data: { in: number; out: number; solde: number }; accent: string }) {
+function CaisseCard({ title, icon, data, accent }: { title: string; icon: ReactNode; data: { in: number; out: number; solde: number }; accent: string }) {
   return (
     <Card>
       <CardHeader className="pb-3">
@@ -267,15 +268,15 @@ function DepenseForm({ onSaved, defaultCat = "autre", label = "Ajouter une dépe
   );
 }
 
-function DialogButton({ open, setOpen, label, variant = "default", children }: { open: boolean; setOpen: (v: boolean) => void; label: string; variant?: "default" | "outline"; children: React.ReactNode }) {
+function DialogButton({ open, setOpen, label, variant = "default", children }: { open: boolean; setOpen: (v: boolean) => void; label: string; variant?: "default" | "outline"; children: ReactNode }) {
   return (
-    <AlertDialog open={open} onOpenChange={setOpen}>
-      <AlertDialogTrigger asChild><Button size="sm" variant={variant}><Plus className="h-4 w-4" />{label}</Button></AlertDialogTrigger>
-      <AlertDialogContent className="max-w-[92vw] rounded-lg sm:max-w-lg">
-        <AlertDialogHeader><AlertDialogTitle>{label}</AlertDialogTitle></AlertDialogHeader>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild><Button size="sm" variant={variant}><Plus className="h-4 w-4" />{label}</Button></DialogTrigger>
+      <DialogContent className="max-w-[92vw] rounded-lg sm:max-w-lg">
+        <DialogHeader><DialogTitle>{label}</DialogTitle></DialogHeader>
         {children}
-      </AlertDialogContent>
-    </AlertDialog>
+      </DialogContent>
+    </Dialog>
   );
 }
 
