@@ -39,12 +39,28 @@ function CaisseSection({ title, icon: Icon, color, encaisse, depenses }: { title
           {title}
         </CardTitle>
       </CardHeader>
-      <CardContent className="grid grid-cols-3 gap-3">
-        <StatCard title="Encaissé" value={formatMoney(encaisse)} icon={TrendingUp} accent="bg-success/15 text-success" />
-        <StatCard title="Dépenses" value={formatMoney(depenses)} icon={TrendingDown} accent="bg-destructive/15 text-destructive" />
-        <StatCard title="Solde" value={formatMoney(solde)} icon={Wallet} accent={solde >= 0 ? "bg-success/15 text-success" : "bg-destructive/15 text-destructive"} />
+      <CardContent className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+        <CaisseMetric title="Encaissé" value={formatMoney(encaisse)} icon={TrendingUp} accent="bg-success/15 text-success" />
+        <CaisseMetric title="Dépenses" value={formatMoney(depenses)} icon={TrendingDown} accent="bg-destructive/15 text-destructive" />
+        <CaisseMetric title="Solde" value={formatMoney(solde)} icon={Wallet} accent={solde >= 0 ? "bg-success/15 text-success" : "bg-destructive/15 text-destructive"} />
       </CardContent>
     </Card>
+  );
+}
+
+function CaisseMetric({ title, value, icon: Icon, accent }: { title: string; value: string; icon: any; accent: string }) {
+  return (
+    <div className="flex min-w-0 items-center justify-between gap-3 rounded-lg border bg-background/50 p-3 sm:flex-col sm:items-start">
+      <div className="flex items-center gap-2">
+        <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-md ${accent}`}>
+          <Icon className="h-4 w-4" />
+        </span>
+        <span className="text-[10px] font-medium uppercase text-muted-foreground sm:text-xs">{title}</span>
+      </div>
+      <span className="max-w-[160px] overflow-x-auto whitespace-nowrap text-right text-sm font-bold leading-none text-foreground sm:max-w-full sm:text-base">
+        {value}
+      </span>
+    </div>
   );
 }
 
