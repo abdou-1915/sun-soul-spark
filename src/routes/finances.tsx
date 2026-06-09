@@ -384,10 +384,12 @@ function PaiementForm({
           m.mutate({
             commande_id: null,
             montant: Number(fd.get("montant")),
-            methode: fd.get("methode") || "especes",
-            source: fd.get("source") || "atelier",
-            categorie: fd.get("categorie") || defaultCat,
-            date_paiement: fd.get("date_paiement") || new Date().toISOString().slice(0, 10),
+            methode: (fd.get("methode") || "especes") as Paiement["methode"],
+            source: (fd.get("source") || "atelier") as Source,
+            categorie: (fd.get("categorie") || defaultCat) as PaiementCategorie,
+            date_paiement: String(
+              fd.get("date_paiement") || new Date().toISOString().slice(0, 10),
+            ),
             notes: String(fd.get("notes") || "") || null,
           });
         }}
@@ -428,10 +430,10 @@ function DepenseForm({
           const fd = new FormData(e.currentTarget);
           m.mutate({
             description: String(fd.get("description")).trim(),
-            categorie: fd.get("categorie") || defaultCat,
+            categorie: (fd.get("categorie") || defaultCat) as DepenseCategorie,
             montant: Number(fd.get("montant")),
-            source: fd.get("source") || "atelier",
-            date_depense: fd.get("date_depense") || new Date().toISOString().slice(0, 10),
+            source: (fd.get("source") || "atelier") as Source,
+            date_depense: String(fd.get("date_depense") || new Date().toISOString().slice(0, 10)),
             notes: String(fd.get("notes") || "") || null,
           });
         }}
