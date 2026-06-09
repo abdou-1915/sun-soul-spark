@@ -387,9 +387,7 @@ function PaiementForm({
             methode: (fd.get("methode") || "especes") as Paiement["methode"],
             source: (fd.get("source") || "atelier") as Source,
             categorie: (fd.get("categorie") || defaultCat) as PaiementCategorie,
-            date_paiement: String(
-              fd.get("date_paiement") || new Date().toISOString().slice(0, 10),
-            ),
+            date_paiement: String(fd.get("date_paiement") || new Date().toISOString().slice(0, 10)),
             notes: String(fd.get("notes") || "") || null,
           });
         }}
