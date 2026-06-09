@@ -2,8 +2,15 @@
 // localdb.ts — replaces Supabase with localStorage
 // ============================================================
 import type {
-  Client, Commande, Paiement, Depense, Materiau, Note,
-  Produit, Vente, VenteItem,
+  Client,
+  Commande,
+  Paiement,
+  Depense,
+  Materiau,
+  Note,
+  Produit,
+  Vente,
+  VenteItem,
 } from "./types";
 
 function uid() {
@@ -15,7 +22,11 @@ function now() {
 }
 
 function load<T>(key: string): T[] {
-  try { return JSON.parse(localStorage.getItem(key) ?? "[]"); } catch { return []; }
+  try {
+    return JSON.parse(localStorage.getItem(key) ?? "[]");
+  } catch {
+    return [];
+  }
 }
 
 function save<T>(key: string, data: T[]) {
@@ -34,19 +45,26 @@ export const clientsDb = {
     return item;
   },
   update(id: string, form: Partial<Client>) {
-    const rows = load<Client>("clients").map(r => r.id === id ? { ...r, ...form } : r);
+    const rows = load<Client>("clients").map((r) => (r.id === id ? { ...r, ...form } : r));
     save("clients", rows);
   },
   delete(id: string) {
-    save("clients", load<Client>("clients").filter(r => r.id !== id));
+    save(
+      "clients",
+      load<Client>("clients").filter((r) => r.id !== id),
+    );
   },
-  count(): number { return load<Client>("clients").length; },
+  count(): number {
+    return load<Client>("clients").length;
+  },
 };
 
 // ── COMMANDES ────────────────────────────────────────────────
 export const commandesDb = {
   list(): Commande[] {
-    return load<Commande>("commandes").sort((a, b) => b.date_commande.localeCompare(a.date_commande));
+    return load<Commande>("commandes").sort((a, b) =>
+      b.date_commande.localeCompare(a.date_commande),
+    );
   },
   insert(form: Omit<Commande, "id" | "created_at">) {
     const rows = load<Commande>("commandes");
@@ -55,18 +73,23 @@ export const commandesDb = {
     return item;
   },
   update(id: string, form: Partial<Commande>) {
-    const rows = load<Commande>("commandes").map(r => r.id === id ? { ...r, ...form } : r);
+    const rows = load<Commande>("commandes").map((r) => (r.id === id ? { ...r, ...form } : r));
     save("commandes", rows);
   },
   delete(id: string) {
-    save("commandes", load<Commande>("commandes").filter(r => r.id !== id));
+    save(
+      "commandes",
+      load<Commande>("commandes").filter((r) => r.id !== id),
+    );
   },
 };
 
 // ── PAIEMENTS ────────────────────────────────────────────────
 export const paiementsDb = {
   list(): Paiement[] {
-    return load<Paiement>("paiements").sort((a, b) => b.date_paiement.localeCompare(a.date_paiement));
+    return load<Paiement>("paiements").sort((a, b) =>
+      b.date_paiement.localeCompare(a.date_paiement),
+    );
   },
   insert(form: Omit<Paiement, "id">) {
     const rows = load<Paiement>("paiements");
@@ -74,8 +97,15 @@ export const paiementsDb = {
     save("paiements", [item, ...rows]);
     return item;
   },
+  update(id: string, form: Partial<Paiement>) {
+    const rows = load<Paiement>("paiements").map((r) => (r.id === id ? { ...r, ...form } : r));
+    save("paiements", rows);
+  },
   delete(id: string) {
-    save("paiements", load<Paiement>("paiements").filter(r => r.id !== id));
+    save(
+      "paiements",
+      load<Paiement>("paiements").filter((r) => r.id !== id),
+    );
   },
 };
 
@@ -90,8 +120,15 @@ export const depensesDb = {
     save("depenses", [item, ...rows]);
     return item;
   },
+  update(id: string, form: Partial<Depense>) {
+    const rows = load<Depense>("depenses").map((r) => (r.id === id ? { ...r, ...form } : r));
+    save("depenses", rows);
+  },
   delete(id: string) {
-    save("depenses", load<Depense>("depenses").filter(r => r.id !== id));
+    save(
+      "depenses",
+      load<Depense>("depenses").filter((r) => r.id !== id),
+    );
   },
 };
 
@@ -107,11 +144,14 @@ export const materiauxDb = {
     return item;
   },
   update(id: string, form: Partial<Materiau>) {
-    const rows = load<Materiau>("materiaux").map(r => r.id === id ? { ...r, ...form } : r);
+    const rows = load<Materiau>("materiaux").map((r) => (r.id === id ? { ...r, ...form } : r));
     save("materiaux", rows);
   },
   delete(id: string) {
-    save("materiaux", load<Materiau>("materiaux").filter(r => r.id !== id));
+    save(
+      "materiaux",
+      load<Materiau>("materiaux").filter((r) => r.id !== id),
+    );
   },
 };
 
@@ -127,11 +167,14 @@ export const notesDb = {
     return item;
   },
   update(id: string, form: Partial<Note>) {
-    const rows = load<Note>("notes").map(r => r.id === id ? { ...r, ...form } : r);
+    const rows = load<Note>("notes").map((r) => (r.id === id ? { ...r, ...form } : r));
     save("notes", rows);
   },
   delete(id: string) {
-    save("notes", load<Note>("notes").filter(r => r.id !== id));
+    save(
+      "notes",
+      load<Note>("notes").filter((r) => r.id !== id),
+    );
   },
 };
 
@@ -147,11 +190,14 @@ export const produitsDb = {
     return item;
   },
   update(id: string, form: Partial<Produit>) {
-    const rows = load<Produit>("produits").map(r => r.id === id ? { ...r, ...form } : r);
+    const rows = load<Produit>("produits").map((r) => (r.id === id ? { ...r, ...form } : r));
     save("produits", rows);
   },
   delete(id: string) {
-    save("produits", load<Produit>("produits").filter(r => r.id !== id));
+    save(
+      "produits",
+      load<Produit>("produits").filter((r) => r.id !== id),
+    );
   },
 };
 
@@ -167,14 +213,17 @@ export const ventesDb = {
     return item;
   },
   delete(id: string) {
-    save("ventes", load<Vente>("ventes").filter(r => r.id !== id));
+    save(
+      "ventes",
+      load<Vente>("ventes").filter((r) => r.id !== id),
+    );
   },
 };
 
 // ── VENTE ITEMS ──────────────────────────────────────────────
 export const venteItemsDb = {
   listByVente(venteId: string): VenteItem[] {
-    return load<VenteItem>("vente_items").filter(r => r.vente_id === venteId);
+    return load<VenteItem>("vente_items").filter((r) => r.vente_id === venteId);
   },
   insert(form: Omit<VenteItem, "id">) {
     const rows = load<VenteItem>("vente_items");
@@ -183,6 +232,9 @@ export const venteItemsDb = {
     return item;
   },
   deleteByVente(venteId: string) {
-    save("vente_items", load<VenteItem>("vente_items").filter(r => r.vente_id !== venteId));
+    save(
+      "vente_items",
+      load<VenteItem>("vente_items").filter((r) => r.vente_id !== venteId),
+    );
   },
 };

@@ -13,9 +13,12 @@ import { Route as ParametresRouteImport } from './routes/parametres'
 import { Route as NotesRouteImport } from './routes/notes'
 import { Route as MateriauxRouteImport } from './routes/materiaux'
 import { Route as FinancesRouteImport } from './routes/finances'
+import { Route as DettesRouteImport } from './routes/dettes'
 import { Route as CommandesRouteImport } from './routes/commandes'
 import { Route as ClientsRouteImport } from './routes/clients'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as BoutiqueVentesRouteImport } from './routes/boutique.ventes'
+import { Route as BoutiqueProduitsRouteImport } from './routes/boutique.produits'
 
 const ParametresRoute = ParametresRouteImport.update({
   id: '/parametres',
@@ -37,6 +40,11 @@ const FinancesRoute = FinancesRouteImport.update({
   path: '/finances',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DettesRoute = DettesRouteImport.update({
+  id: '/dettes',
+  path: '/dettes',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CommandesRoute = CommandesRouteImport.update({
   id: '/commandes',
   path: '/commandes',
@@ -52,34 +60,53 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BoutiqueVentesRoute = BoutiqueVentesRouteImport.update({
+  id: '/boutique/ventes',
+  path: '/boutique/ventes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BoutiqueProduitsRoute = BoutiqueProduitsRouteImport.update({
+  id: '/boutique/produits',
+  path: '/boutique/produits',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/clients': typeof ClientsRoute
   '/commandes': typeof CommandesRoute
+  '/dettes': typeof DettesRoute
   '/finances': typeof FinancesRoute
   '/materiaux': typeof MateriauxRoute
   '/notes': typeof NotesRoute
   '/parametres': typeof ParametresRoute
+  '/boutique/produits': typeof BoutiqueProduitsRoute
+  '/boutique/ventes': typeof BoutiqueVentesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/clients': typeof ClientsRoute
   '/commandes': typeof CommandesRoute
+  '/dettes': typeof DettesRoute
   '/finances': typeof FinancesRoute
   '/materiaux': typeof MateriauxRoute
   '/notes': typeof NotesRoute
   '/parametres': typeof ParametresRoute
+  '/boutique/produits': typeof BoutiqueProduitsRoute
+  '/boutique/ventes': typeof BoutiqueVentesRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/clients': typeof ClientsRoute
   '/commandes': typeof CommandesRoute
+  '/dettes': typeof DettesRoute
   '/finances': typeof FinancesRoute
   '/materiaux': typeof MateriauxRoute
   '/notes': typeof NotesRoute
   '/parametres': typeof ParametresRoute
+  '/boutique/produits': typeof BoutiqueProduitsRoute
+  '/boutique/ventes': typeof BoutiqueVentesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -87,38 +114,50 @@ export interface FileRouteTypes {
     | '/'
     | '/clients'
     | '/commandes'
+    | '/dettes'
     | '/finances'
     | '/materiaux'
     | '/notes'
     | '/parametres'
+    | '/boutique/produits'
+    | '/boutique/ventes'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/clients'
     | '/commandes'
+    | '/dettes'
     | '/finances'
     | '/materiaux'
     | '/notes'
     | '/parametres'
+    | '/boutique/produits'
+    | '/boutique/ventes'
   id:
     | '__root__'
     | '/'
     | '/clients'
     | '/commandes'
+    | '/dettes'
     | '/finances'
     | '/materiaux'
     | '/notes'
     | '/parametres'
+    | '/boutique/produits'
+    | '/boutique/ventes'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ClientsRoute: typeof ClientsRoute
   CommandesRoute: typeof CommandesRoute
+  DettesRoute: typeof DettesRoute
   FinancesRoute: typeof FinancesRoute
   MateriauxRoute: typeof MateriauxRoute
   NotesRoute: typeof NotesRoute
   ParametresRoute: typeof ParametresRoute
+  BoutiqueProduitsRoute: typeof BoutiqueProduitsRoute
+  BoutiqueVentesRoute: typeof BoutiqueVentesRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -151,6 +190,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FinancesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dettes': {
+      id: '/dettes'
+      path: '/dettes'
+      fullPath: '/dettes'
+      preLoaderRoute: typeof DettesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/commandes': {
       id: '/commandes'
       path: '/commandes'
@@ -172,6 +218,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/boutique/ventes': {
+      id: '/boutique/ventes'
+      path: '/boutique/ventes'
+      fullPath: '/boutique/ventes'
+      preLoaderRoute: typeof BoutiqueVentesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/boutique/produits': {
+      id: '/boutique/produits'
+      path: '/boutique/produits'
+      fullPath: '/boutique/produits'
+      preLoaderRoute: typeof BoutiqueProduitsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -179,20 +239,14 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ClientsRoute: ClientsRoute,
   CommandesRoute: CommandesRoute,
+  DettesRoute: DettesRoute,
   FinancesRoute: FinancesRoute,
   MateriauxRoute: MateriauxRoute,
   NotesRoute: NotesRoute,
   ParametresRoute: ParametresRoute,
+  BoutiqueProduitsRoute: BoutiqueProduitsRoute,
+  BoutiqueVentesRoute: BoutiqueVentesRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}
