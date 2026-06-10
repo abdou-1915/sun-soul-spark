@@ -249,10 +249,12 @@ function DebtRow({
     <div className="flex items-start justify-between gap-2 rounded-lg border p-3">
       <div className="min-w-0 flex-1">
         <p className="font-medium">{typeLabels[item.type]}</p>
+        {item.note && (
+          <p className="mt-0.5 text-xs text-foreground/80 break-words">{item.note}</p>
+        )}
         <p className="mt-1 flex flex-wrap items-center gap-1 text-xs text-muted-foreground">
           {formatDate(item.date)}
           <Badge variant="outline">{SOURCE_LABELS[item.source]}</Badge>
-          {item.note && <span className="break-words">{item.note}</span>}
         </p>
       </div>
       <div className="flex shrink-0 items-center gap-1">
