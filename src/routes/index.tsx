@@ -191,7 +191,15 @@ function Dashboard() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Tableau de bord" description="Vue d'ensemble de votre activité" />
+      <PageHeader
+        title="Tableau de bord"
+        description="Vue d'ensemble de votre activité"
+        action={
+          <Button asChild>
+            <Link to="/clients"><UserPlus className="h-4 w-4" />Nouveau client</Link>
+          </Button>
+        }
+      />
 
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
         <StatCard title="Clients" value={String(data?.nbClients ?? 0)} icon={Users} />
