@@ -11,16 +11,8 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageHeader } from "@/components/page-header";
 import { formatMoney, formatDate, STATUT_LABELS } from "@/lib/types";
-import {
-  Users,
-  ClipboardList,
-  TrendingUp,
-  TrendingDown,
-  Wallet,
-  Clock,
-  Wrench,
-  ShoppingCart,
-} from "lucide-react";
+import { Users, ClipboardList, TrendingUp, TrendingDown, Wallet, Clock, Wrench, ShoppingCart, UserPlus } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import type { LucideIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "@tanstack/react-router";
