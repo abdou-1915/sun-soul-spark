@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/page-header";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -12,9 +11,14 @@ import {
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
-import { Trash2, AlertTriangle } from "lucide-react";
+import { Trash2, AlertTriangle, Download, Upload } from "lucide-react";
 
 export const Route = createFileRoute("/parametres")({ component: Parametres });
+
+const ALL_KEYS = [
+  "clients", "commandes", "paiements", "depenses",
+  "materiaux", "notes", "produits", "ventes", "vente_items",
+] as const;
 
 const GROUPS = [
   { key: "finances", label: "Finances (paiements & dépenses)", tables: ["paiements", "depenses"] },
@@ -29,6 +33,7 @@ function Parametres() {
   const qc = useQueryClient();
   const [selected, setSelected] = useState<Record<string, boolean>>({});
   const [confirmText, setConfirmText] = useState("");
+  const fileRef = useRef<HTMLInputElement>(null);
 
   const toggle = (k: string) => setSelected((s) => ({ ...s, [k]: !s[k] }));
   const allKeys = GROUPS.map((g) => g.key);
@@ -42,10 +47,7 @@ function Parametres() {
     mutationFn: async () => {
       const tables = GROUPS.filter((g) => selected[g.key]).flatMap((g) => g.tables);
       if (tables.length === 0) throw new Error("Sélectionnez au moins une catégorie");
-      for (const t of tables) {
-        const { error } = await supabase.from(t as any).delete().not("id", "is", null);
-        if (error) throw new Error(`${t}: ${error.message}`);
-      }
+      for (const t of tables) localStorage.removeItem(t);
     },
     onSuccess: () => {
       toast.success("Données supprimées");
@@ -56,11 +58,121 @@ function Parametres() {
     onError: (e: any) => toast.error(e.message),
   });
 
+  const handleExport = () => {
+    try {
+      const dump: Record<string, unknown> = {
+        _app: "atelier-pro",
+        _version: 1,
+        _exportedAt: new Date().toISOString(),
+      };
+      for (const k of ALL_KEYS) {
+        try { dump[k] = JSON.parse(localStorage.getItem(k) ?? "[]"); }
+        catch { dump[k] = []; }
+      }
+      const blob = new Blob([JSON.stringify(dump, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      const stamp = new Date().toISOString().slice(0, 10);
+      a.href = url;
+      a.download = `atelier-pro-backup-${stamp}.json`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      toast.success("Sauvegarde exportée");
+    } catch (e: any) {
+      toast.error("Erreur d'export : " + e.message);
+    }
+  };
+
+  const handleImport = async (file: File, mode: "replace" | "merge") => {
+    try {
+      const text = await file.text();
+      const data = JSON.parse(text);
+      if (!data || typeof data !== "object") throw new Error("Fichier invalide");
+
+      for (const k of ALL_KEYS) {
+        if (!Array.isArray(data[k])) continue;
+        if (mode === "replace") {
+          localStorage.setItem(k, JSON.stringify(data[k]));
+        } else {
+          let existing: any[] = [];
+          try { existing = JSON.parse(localStorage.getItem(k) ?? "[]"); } catch { existing = []; }
+          const seen = new Set(existing.map((r: any) => r?.id).filter(Boolean));
+          const merged = [...existing, ...data[k].filter((r: any) => !seen.has(r?.id))];
+          localStorage.setItem(k, JSON.stringify(merged));
+        }
+      }
+      qc.invalidateQueries();
+      toast.success(mode === "replace" ? "Données restaurées" : "Données fusionnées");
+    } catch (e: any) {
+      toast.error("Import échoué : " + e.message);
+    } finally {
+      if (fileRef.current) fileRef.current.value = "";
+    }
+  };
+
+  const [importMode, setImportMode] = useState<"replace" | "merge">("merge");
+
   const canConfirm = confirmText === "SUPPRIMER" && Object.values(selected).some(Boolean);
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Paramètres" description="Gestion et maintenance de vos données" />
+      <PageHeader title="Paramètres" description="Sauvegarde, restauration et maintenance" />
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Download className="h-5 w-5" /> Sauvegarde & Restauration
+          </CardTitle>
+          <CardDescription>
+            Exportez toutes vos données dans un fichier JSON, ou importez une sauvegarde
+            (utile pour transférer vos données entre appareils).
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Button onClick={handleExport} className="w-full sm:w-auto">
+            <Download className="h-4 w-4" /> Exporter mes données (.json)
+          </Button>
+
+          <div className="space-y-3 rounded-lg border p-4">
+            <p className="text-sm font-medium">Importer une sauvegarde</p>
+            <div className="flex flex-col gap-2 sm:flex-row">
+              <label className="flex items-center gap-2 text-sm">
+                <input
+                  type="radio"
+                  name="importMode"
+                  checked={importMode === "merge"}
+                  onChange={() => setImportMode("merge")}
+                />
+                Fusionner (ajouter sans écraser)
+              </label>
+              <label className="flex items-center gap-2 text-sm">
+                <input
+                  type="radio"
+                  name="importMode"
+                  checked={importMode === "replace"}
+                  onChange={() => setImportMode("replace")}
+                />
+                Remplacer (écrase les données actuelles)
+              </label>
+            </div>
+            <input
+              ref={fileRef}
+              type="file"
+              accept="application/json,.json"
+              className="hidden"
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                if (f) handleImport(f, importMode);
+              }}
+            />
+            <Button variant="outline" onClick={() => fileRef.current?.click()} className="w-full sm:w-auto">
+              <Upload className="h-4 w-4" /> Choisir un fichier .json
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
 
       <Card className="border-destructive/30">
         <CardHeader>
