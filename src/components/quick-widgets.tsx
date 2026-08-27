@@ -245,7 +245,7 @@ export function QuickFinanceWidget() {
                   </SelectTrigger>
                   <SelectContent>
                     {Object.entries(PAIEMENT_CATEGORIE_LABELS)
-                      .filter(([k]) !["dette_recue", "remboursement_recu"].includes(k))
+                      .filter(([k]) => !["dette_recue", "remboursement_recu"].includes(k))
                       .map(([k, v]) => (
                         <SelectItem key={k} value={k}>
                           {v}
