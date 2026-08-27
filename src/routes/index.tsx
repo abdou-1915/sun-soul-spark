@@ -120,9 +120,9 @@ function QuickAction({
     <Button
       asChild
       variant="outline"
-      className={`h-auto flex-col items-center gap-2 rounded-2xl border-2 border-border bg-card p-3 py-4 hover:bg-accent ${primary ? "border-primary/30 text-primary hover:text-primary" : ""}`}
+      className={`h-auto flex-col items-center gap-2 rounded-2xl border-2 border-border bg-card p-3 py-4 hover:bg-accent ${primary ? "border-primary/40 text-primary hover:text-primary" : ""}`}
     >
-      <Link to={to}>
+      <Link to={to} className={primary ? "text-primary" : ""}>
         <Icon className="h-5 w-5" />
         <span className="text-[10px] font-semibold leading-tight">{label}</span>
       </Link>
