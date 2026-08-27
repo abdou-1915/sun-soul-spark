@@ -63,10 +63,10 @@ export function QuickCommandeWidget() {
   });
 
   return (
-    <Card>
+    <Card className="rounded-2xl border border-border">
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2 text-base">
-          <span className="flex h-8 w-8 items-center justify-center rounded-md bg-primary/15 text-primary">
+          <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary/15 text-primary">
             <ClipboardList className="h-4 w-4" />
           </span>
           Nouvelle commande rapide
@@ -188,10 +188,10 @@ export function QuickFinanceWidget() {
   });
 
   return (
-    <Card>
+    <Card className="rounded-2xl border border-border">
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2 text-base">
-          <span className="flex h-8 w-8 items-center justify-center rounded-md bg-success/15 text-success">
+          <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-success/15 text-success">
             <Wallet className="h-4 w-4" />
           </span>
           Mouvement d'argent rapide
