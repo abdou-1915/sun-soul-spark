@@ -260,7 +260,7 @@ export function QuickFinanceWidget() {
                   </SelectTrigger>
                   <SelectContent>
                     {Object.entries(DEPENSE_CATEGORIE_LABELS)
-                      .filter(([k]) !["dette_payee", "pret_accorde"].includes(k))
+                      .filter(([k]) => !["dette_payee", "pret_accorde"].includes(k))
                       .map(([k, v]) => (
                         <SelectItem key={k} value={k}>
                           {v}
