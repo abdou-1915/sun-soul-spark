@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { QuickCommandeWidget, QuickFinanceWidget } from "@/components/quick-widgets";
-import { formatMoney, formatDate, STATUT_LABELS } from "@/lib/types";
+import { formatMoney, STATUT_LABELS } from "@/lib/types";
 import {
   Users,
   ClipboardList,
@@ -36,7 +36,6 @@ import {
   Package,
   AlertTriangle,
   Plus,
-  ArrowRight,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
