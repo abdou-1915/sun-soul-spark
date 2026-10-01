@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -12,6 +13,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { QuickCommandeWidget, QuickFinanceWidget } from "@/components/quick-widgets";
 import { formatMoney, formatDate, STATUT_LABELS } from "@/lib/types";
 import {
@@ -120,13 +130,50 @@ function QuickAction({
     <Button
       asChild
       variant="outline"
-      className={`h-auto flex-col items-center gap-2 rounded-2xl border-2 border-border bg-card p-3 py-4 hover:bg-accent ${primary ? "border-primary/40 text-primary hover:text-primary" : ""}`}
+      className={`h-14 w-14 justify-self-center rounded-2xl border-2 border-border bg-card p-0 hover:bg-accent sm:h-16 sm:w-16 ${
+        primary ? "border-primary/40 text-primary hover:text-primary" : ""
+      }`}
     >
-      <Link to={to} className={primary ? "text-primary" : ""}>
-        <Icon className="h-5 w-5" />
-        <span className="text-[10px] font-semibold leading-tight">{label}</span>
+      <Link to={to} aria-label={label} title={label}>
+        <Icon className="h-5 w-5 sm:h-6 sm:w-6" />
       </Link>
     </Button>
+  );
+}
+
+function QuickAddButton() {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button
+          size="icon"
+          aria-label="Ajout rapide"
+          className="h-14 w-14 justify-self-center rounded-full shadow-lg shadow-primary/30 sm:h-16 sm:w-16"
+        >
+          <Plus className="h-6 w-6 sm:h-7 sm:w-7" />
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="max-h-[85vh] overflow-y-auto rounded-2xl p-4 sm:max-w-md">
+        <DialogHeader className="sr-only">
+          <DialogTitle>Ajout rapide</DialogTitle>
+          <DialogDescription>Créer une commande ou enregistrer un mouvement d'argent</DialogDescription>
+        </DialogHeader>
+        <Tabs defaultValue="commande">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="commande">Commande</TabsTrigger>
+            <TabsTrigger value="finance">Argent</TabsTrigger>
+          </TabsList>
+          <TabsContent value="commande" className="mt-3">
+            <QuickCommandeWidget />
+          </TabsContent>
+          <TabsContent value="finance" className="mt-3">
+            <QuickFinanceWidget />
+          </TabsContent>
+        </Tabs>
+      </DialogContent>
+    </Dialog>
   );
 }
 
@@ -268,10 +315,11 @@ function Dashboard() {
         <h2 className="mb-3 ml-1 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
           Actions rapides
         </h2>
-        <div className="grid grid-cols-4 gap-3">
-          <QuickAction icon={Users} label="Client" to="/clients" />
-          <QuickAction icon={ClipboardList} label="Commande" to="/commandes" primary />
-          <QuickAction icon={Wallet} label="Finance" to="/finances" />
+        <div className="grid grid-cols-5 items-center gap-2 sm:gap-3">
+          <QuickAction icon={Users} label="Clients" to="/clients" />
+          <QuickAction icon={ClipboardList} label="Commandes" to="/commandes" primary />
+          <QuickAddButton />
+          <QuickAction icon={Wallet} label="Finances" to="/finances" />
           <QuickAction icon={Package} label="Stock" to="/materiaux" />
         </div>
       </section>
