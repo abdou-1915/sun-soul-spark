@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { QuickCommandeWidget, QuickFinanceWidget } from "@/components/quick-widgets";
-import { formatMoney, STATUT_LABELS } from "@/lib/types";
+import { formatMoney } from "@/lib/types";
 import {
   Users,
   ClipboardList,
