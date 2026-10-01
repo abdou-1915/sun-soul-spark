@@ -325,9 +325,8 @@ function Dashboard() {
       </section>
 
       {/* Stock alerts */}
-
-        <Card className="rounded-2xl border border-border">
-          <CardHeader className="pb-3">
+      <Card className="rounded-2xl border border-border">
+        <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2 text-base">
               <AlertTriangle className="h-4 w-4 text-warning" />
               Alertes stock
@@ -356,8 +355,7 @@ function Dashboard() {
               </p>
             )}
           </CardContent>
-        </Card>
-      </div>
+      </Card>
     </div>
   );
 }
