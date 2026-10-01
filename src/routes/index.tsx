@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { QuickCommandeWidget, QuickFinanceWidget } from "@/components/quick-widgets";
-import { formatMoney, formatDate, STATUT_LABELS } from "@/lib/types";
+import { formatMoney } from "@/lib/types";
 import {
   Users,
   ClipboardList,
@@ -36,7 +36,6 @@ import {
   Package,
   AlertTriangle,
   Plus,
-  ArrowRight,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -324,52 +323,9 @@ function Dashboard() {
         </div>
       </section>
 
-      {/* Quick widgets */}
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <QuickCommandeWidget />
-        <QuickFinanceWidget />
-      </div>
-
-      {/* Recent orders + stock alerts */}
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <Card className="rounded-2xl border border-border">
-          <CardHeader className="flex flex-row items-center justify-between pb-3">
-            <CardTitle className="text-base">Dernières commandes</CardTitle>
-            <Button asChild variant="ghost" size="sm" className="h-7 gap-1 text-xs">
-              <Link to="/commandes">
-                Voir tout <ArrowRight className="h-3 w-3" />
-              </Link>
-            </Button>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            {commandes.slice(0, 6).map((c) => (
-              <Link
-                key={c.id}
-                to="/commandes"
-                className="flex items-center justify-between rounded-xl border border-border bg-background/50 p-3 transition hover:bg-accent/50"
-              >
-                <div className="min-w-0 flex-1">
-                  <p className="truncate font-medium text-foreground">{c.titre}</p>
-                  <p className="text-xs text-muted-foreground">{formatDate(c.date_commande)}</p>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Badge variant="outline">{STATUT_LABELS[c.statut]}</Badge>
-                  <span className="font-semibold text-foreground">
-                    {formatMoney(Number(c.prix_total))}
-                  </span>
-                </div>
-              </Link>
-            ))}
-            {commandes.length === 0 && (
-              <p className="py-8 text-center text-sm text-muted-foreground">
-                Aucune commande pour le moment
-              </p>
-            )}
-          </CardContent>
-        </Card>
-
-        <Card className="rounded-2xl border border-border">
-          <CardHeader className="pb-3">
+      {/* Stock alerts */}
+      <Card className="rounded-2xl border border-border">
+        <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2 text-base">
               <AlertTriangle className="h-4 w-4 text-warning" />
               Alertes stock
@@ -398,8 +354,7 @@ function Dashboard() {
               </p>
             )}
           </CardContent>
-        </Card>
-      </div>
+      </Card>
     </div>
   );
 }
