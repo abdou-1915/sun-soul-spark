@@ -23,6 +23,9 @@ function ProduitsPage() {
   const [edit, setEdit] = useState<Produit | null>(null);
   const [categorie, setCategorie] = useState<string>("accessoire");
   const [q, setQ] = useState("");
+  const [usd, setUsd] = useState<string>("");
+  const [taux, setTaux] = useState<string>(() => localStorage.getItem("taux_usd") || "");
+  const [prixAchat, setPrixAchat] = useState<string>("0");
 
   const { data: items = [] } = useQuery({
     queryKey: ["produits"],
@@ -62,8 +65,8 @@ function ProduitsPage() {
     });
   };
 
-  const openNew = () => { setEdit(null); setCategorie("accessoire"); setOpen(true); };
-  const openEdit = (p: Produit) => { setEdit(p); setCategorie(p.categorie); setOpen(true); };
+  const openNew = () => { setEdit(null); setCategorie("accessoire"); setUsd(""); setPrixAchat("0"); setOpen(true); };
+  const openEdit = (p: Produit) => { setEdit(p); setCategorie(p.categorie); setUsd(""); setPrixAchat(String(p.prix_achat ?? 0)); setOpen(true); };
 
   return (
     <div className="space-y-6">
@@ -88,9 +91,16 @@ function ProduitsPage() {
                   <div><Label>Marque</Label><Input name="marque" defaultValue={edit?.marque ?? ""} placeholder="Apple, Samsung..." /></div>
                 </div>
                 <div><Label>Code-barre</Label><Input name="code_barre" defaultValue={edit?.code_barre ?? ""} /></div>
+                <div className="rounded-xl border bg-muted/40 p-3 space-y-3">
+                  <p className="text-xs font-semibold text-muted-foreground">Calculateur de prix d'achat (USD → DA)</p>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div><Label>Prix en dollar ($)</Label><Input type="number" step="0.01" min="0" value={usd} onChange={(e) => { setUsd(e.target.value); setPrixAchat(((Number(e.target.value) || 0) * (Number(taux) || 0)).toFixed(2)); }} placeholder="Ex: 12.5" /></div>
+                    <div><Label>Taux (DA pour 1$)</Label><Input type="number" step="0.01" min="0" value={taux} onChange={(e) => { setTaux(e.target.value); localStorage.setItem("taux_usd", e.target.value); setPrixAchat(((Number(usd) || 0) * (Number(e.target.value) || 0)).toFixed(2)); }} placeholder="Ex: 240" /></div>
+                  </div>
+                </div>
                 <div className="grid grid-cols-2 gap-3">
-                  <div><Label>Prix d'achat</Label><Input name="prix_achat" type="number" step="0.01" defaultValue={edit?.prix_achat ?? 0} /></div>
-                  <div><Label>Prix de vente</Label><Input name="prix_vente" type="number" step="0.01" defaultValue={edit?.prix_vente ?? 0} /></div>
+                  <div><Label>Prix d'achat (DA)</Label><Input name="prix_achat" type="number" step="0.01" min="0" value={prixAchat} onChange={(e) => setPrixAchat(e.target.value)} /></div>
+                  <div><Label>Prix de vente (DA)</Label><Input name="prix_vente" type="number" step="0.01" min="0" defaultValue={edit?.prix_vente ?? 0} /></div>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div><Label>Stock</Label><Input name="stock" type="number" step="1" defaultValue={edit?.stock ?? 0} /></div>
