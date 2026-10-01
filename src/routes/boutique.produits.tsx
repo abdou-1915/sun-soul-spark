@@ -65,8 +65,8 @@ function ProduitsPage() {
     });
   };
 
-  const openNew = () => { setEdit(null); setCategorie("accessoire"); setOpen(true); };
-  const openEdit = (p: Produit) => { setEdit(p); setCategorie(p.categorie); setOpen(true); };
+  const openNew = () => { setEdit(null); setCategorie("accessoire"); setUsd(""); setPrixAchat("0"); setOpen(true); };
+  const openEdit = (p: Produit) => { setEdit(p); setCategorie(p.categorie); setUsd(""); setPrixAchat(String(p.prix_achat ?? 0)); setOpen(true); };
 
   return (
     <div className="space-y-6">
