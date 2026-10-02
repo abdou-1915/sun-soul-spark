@@ -82,9 +82,19 @@ export async function startSync(userId: string) {
     const { error: upErr } = await supabase.from("user_store").upsert(rows, { onConflict: "user_id,key" });
     if (upErr) { console.error("[sync]", upErr); setStatus("error"); return; }
     setStatus("idle");
+  } else if (!alreadyMigrated) {
+    // New phone on an existing account: merge this phone's data into the account (no loss).
+    const local = Object.fromEntries(SYNC_KEYS.map((k) => [k, readLocal(k)]));
+    await pullAll();
+    for (const k of SYNC_KEYS) {
+      const cloud = readLocal(k) as { id?: string }[];
+      const seen = new Set(cloud.map((r) => r?.id).filter(Boolean));
+      const extra = (local[k] as { id?: string }[]).filter((r) => r?.id && !seen.has(r.id));
+      if (extra.length) setCollection(k, [...extra, ...cloud]);
+    }
+    await flushSync();
   } else {
-    // Account already has data: cloud is the source of truth.
-    for (const k of SYNC_KEYS) localStorage.removeItem(k);
+    // Cloud is the source of truth.
     await pullAll();
   }
   localStorage.setItem(MIGRATED_FLAG, userId);
