@@ -1,61 +1,34 @@
-const CACHE_NAME = 'atelier-pro-v1';
+const CACHE_NAME = 'atelier-pro-v2';
 
-const ASSETS_TO_CACHE = [
-  '/',
-  '/index.html',
-  '/clients',
-  '/commandes',
-  '/finances',
-  '/materiaux',
-  '/notes',
-];
+self.addEventListener('install', () => self.skipWaiting());
 
-// Install: cache essential files
-self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS_TO_CACHE);
-    })
-  );
-  self.skipWaiting();
-});
-
-// Activate: clean old caches
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) =>
-      Promise.all(
-        keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))
-      )
+      Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k)))
     )
   );
   self.clients.claim();
 });
 
-// Fetch: serve from cache, fallback to network, then cache new responses
+// Network-first for same-origin pages/assets only. Never touch sign-in,
+// server calls or cloud data requests so data is always fresh.
 self.addEventListener('fetch', (event) => {
-  // Skip non-GET and browser-extension requests
-  if (event.request.method !== 'GET' || !event.request.url.startsWith('http')) return;
+  const req = event.request;
+  if (req.method !== 'GET') return;
+  const url = new URL(req.url);
+  if (url.origin !== self.location.origin) return;
+  if (url.pathname.startsWith('/~oauth') || url.pathname.startsWith('/_serverFn') || url.pathname.startsWith('/api')) return;
 
   event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      if (cachedResponse) return cachedResponse;
-
-      return fetch(event.request)
-        .then((networkResponse) => {
-          // Cache successful responses
-          if (networkResponse && networkResponse.status === 200) {
-            const responseClone = networkResponse.clone();
-            caches.open(CACHE_NAME).then((cache) => {
-              cache.put(event.request, responseClone);
-            });
-          }
-          return networkResponse;
-        })
-        .catch(() => {
-          // If both cache and network fail, return index.html (for SPA routing)
-          return caches.match('/index.html');
-        });
-    })
+    fetch(req)
+      .then((res) => {
+        if (res && res.status === 200) {
+          const copy = res.clone();
+          caches.open(CACHE_NAME).then((c) => c.put(req, copy));
+        }
+        return res;
+      })
+      .catch(() => caches.match(req).then((r) => r || caches.match('/')))
   );
 });

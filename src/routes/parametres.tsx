@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { Trash2, AlertTriangle, Download, Upload } from "lucide-react";
+import { setCollection, flushSync } from "@/lib/cloud-sync";
 
 export const Route = createFileRoute("/parametres")({ component: Parametres });
 
@@ -47,7 +48,8 @@ function Parametres() {
     mutationFn: async () => {
       const tables = GROUPS.filter((g) => selected[g.key]).flatMap((g) => g.tables);
       if (tables.length === 0) throw new Error("Sélectionnez au moins une catégorie");
-      for (const t of tables) localStorage.removeItem(t);
+      for (const t of tables) setCollection(t, []);
+      await flushSync();
     },
     onSuccess: () => {
       toast.success("Données supprimées");
@@ -94,15 +96,16 @@ function Parametres() {
       for (const k of ALL_KEYS) {
         if (!Array.isArray(data[k])) continue;
         if (mode === "replace") {
-          localStorage.setItem(k, JSON.stringify(data[k]));
+          setCollection(k, data[k]);
         } else {
           let existing: any[] = [];
           try { existing = JSON.parse(localStorage.getItem(k) ?? "[]"); } catch { existing = []; }
           const seen = new Set(existing.map((r: any) => r?.id).filter(Boolean));
           const merged = [...existing, ...data[k].filter((r: any) => !seen.has(r?.id))];
-          localStorage.setItem(k, JSON.stringify(merged));
+          setCollection(k, merged);
         }
       }
+      await flushSync();
       qc.invalidateQueries();
       toast.success(mode === "replace" ? "Données restaurées" : "Données fusionnées");
     } catch (e: any) {
