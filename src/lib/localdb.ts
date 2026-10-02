@@ -12,6 +12,7 @@ import type {
   Vente,
   VenteItem,
 } from "./types";
+import { scheduleSync } from "./cloud-sync";
 
 function uid() {
   return crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2) + Date.now();
@@ -31,6 +32,7 @@ function load<T>(key: string): T[] {
 
 function save<T>(key: string, data: T[]) {
   localStorage.setItem(key, JSON.stringify(data));
+  scheduleSync(key);
 }
 
 // ── CLIENTS ──────────────────────────────────────────────────
