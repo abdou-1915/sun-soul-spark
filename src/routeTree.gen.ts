@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AnalyseurRouteImport } from './routes/analyseur'
 import { Route as ClientsRouteImport } from './routes/clients'
 import { Route as CommandesRouteImport } from './routes/commandes'
 import { Route as DettesRouteImport } from './routes/dettes'
@@ -24,6 +25,11 @@ import { Route as BoutiqueVentesRouteImport } from './routes/boutique.ventes'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AnalyseurRoute = AnalyseurRouteImport.update({
+  id: '/analyseur',
+  path: '/analyseur',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ClientsRoute = ClientsRouteImport.update({
@@ -79,6 +85,7 @@ const BoutiqueVentesRoute = BoutiqueVentesRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/analyseur': typeof AnalyseurRoute
   '/clients': typeof ClientsRoute
   '/commandes': typeof CommandesRoute
   '/dettes': typeof DettesRoute
@@ -92,6 +99,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/analyseur': typeof AnalyseurRoute
   '/clients': typeof ClientsRoute
   '/commandes': typeof CommandesRoute
   '/dettes': typeof DettesRoute
@@ -106,6 +114,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/analyseur': typeof AnalyseurRoute
   '/clients': typeof ClientsRoute
   '/commandes': typeof CommandesRoute
   '/dettes': typeof DettesRoute
@@ -121,6 +130,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/analyseur'
     | '/clients'
     | '/commandes'
     | '/dettes'
@@ -134,6 +144,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/analyseur'
     | '/clients'
     | '/commandes'
     | '/dettes'
@@ -147,6 +158,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/analyseur'
     | '/clients'
     | '/commandes'
     | '/dettes'
@@ -161,6 +173,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AnalyseurRoute: typeof AnalyseurRoute
   ClientsRoute: typeof ClientsRoute
   CommandesRoute: typeof CommandesRoute
   DettesRoute: typeof DettesRoute
@@ -180,6 +193,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/analyseur': {
+      id: '/analyseur'
+      path: '/analyseur'
+      fullPath: '/analyseur'
+      preLoaderRoute: typeof AnalyseurRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/clients': {
@@ -257,6 +277,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AnalyseurRoute: AnalyseurRoute,
   ClientsRoute: ClientsRoute,
   CommandesRoute: CommandesRoute,
   DettesRoute: DettesRoute,

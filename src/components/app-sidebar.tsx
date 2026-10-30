@@ -12,6 +12,7 @@ import {
   Settings,
   HandCoins,
   Calculator,
+  LineChart,
 } from "lucide-react";
 import {
   Sidebar,
@@ -33,6 +34,7 @@ const items = [
   { title: "Dettes", url: "/dettes", icon: HandCoins },
   { title: "Matériaux", url: "/materiaux", icon: Package },
   { title: "Notes", url: "/notes", icon: StickyNote },
+  { title: "Analyseur de prix", url: "/analyseur", icon: LineChart },
 ];
 
 const boutiqueItems = [
