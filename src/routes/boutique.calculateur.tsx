@@ -6,6 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { formatMoney } from "@/lib/types";
+import { achatsDevisesDb } from "@/lib/localdb";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/boutique/calculateur")({
   head: () => ({
@@ -56,6 +58,10 @@ function CalculateurPage() {
           <div><Label>Euros achetés (€)</Label><Input type="number" inputMode="decimal" value={eur} onChange={(e) => setEur(e.target.value)} /></div>
           <div><Label>Dollars reçus ($)</Label><Input type="number" inputMode="decimal" value={usd} onChange={(e) => setUsd(e.target.value)} /></div>
           <div><Label>Dinars payés (DA)</Label><Input type="number" inputMode="decimal" value={da} onChange={(e) => setDa(e.target.value)} /></div>
+          <Button type="button" variant="outline" className="sm:col-span-3"
+            onClick={() => { if (num(da) > 0) { achatsDevisesDb.insert({ eur: num(eur), usd: num(usd), da: num(da) }); toast.success("Achat enregistré dans l'historique"); } }}>
+            Enregistrer cet achat dans l'historique
+          </Button>
         </CardContent>
       </Card>
 

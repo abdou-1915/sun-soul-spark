@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 export const SYNC_KEYS = [
   "clients", "commandes", "paiements", "depenses",
-  "materiaux", "notes", "produits", "ventes", "vente_items",
+  "materiaux", "notes", "produits", "ventes", "vente_items", "achats_devises",
 ] as const;
 
 const MIGRATED_FLAG = "cloud_migrated_user";

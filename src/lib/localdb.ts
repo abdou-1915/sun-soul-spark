@@ -240,3 +240,19 @@ export const venteItemsDb = {
     );
   },
 };
+
+// ── ACHATS DE DEVISES ────────────────────────────────────────
+export type AchatDevise = { id: string; date: string; eur: number; usd: number; da: number };
+export const achatsDevisesDb = {
+  list(): AchatDevise[] {
+    return load<AchatDevise>("achats_devises").sort((a, b) => b.date.localeCompare(a.date));
+  },
+  insert(form: Omit<AchatDevise, "id" | "date">) {
+    const item: AchatDevise = { ...form, id: uid(), date: now() };
+    save("achats_devises", [item, ...load<AchatDevise>("achats_devises")]);
+    return item;
+  },
+  delete(id: string) {
+    save("achats_devises", load<AchatDevise>("achats_devises").filter((r) => r.id !== id));
+  },
+};
