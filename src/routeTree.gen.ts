@@ -9,45 +9,21 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as ParametresRouteImport } from './routes/parametres'
-import { Route as NotesRouteImport } from './routes/notes'
-import { Route as MateriauxRouteImport } from './routes/materiaux'
-import { Route as FinancesRouteImport } from './routes/finances'
-import { Route as DettesRouteImport } from './routes/dettes'
-import { Route as CommandesRouteImport } from './routes/commandes'
-import { Route as ClientsRouteImport } from './routes/clients'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as BoutiqueVentesRouteImport } from './routes/boutique.ventes'
+import { Route as ClientsRouteImport } from './routes/clients'
+import { Route as CommandesRouteImport } from './routes/commandes'
+import { Route as DettesRouteImport } from './routes/dettes'
+import { Route as FinancesRouteImport } from './routes/finances'
+import { Route as MateriauxRouteImport } from './routes/materiaux'
+import { Route as NotesRouteImport } from './routes/notes'
+import { Route as ParametresRouteImport } from './routes/parametres'
+import { Route as BoutiqueCalculateurRouteImport } from './routes/boutique.calculateur'
 import { Route as BoutiqueProduitsRouteImport } from './routes/boutique.produits'
+import { Route as BoutiqueVentesRouteImport } from './routes/boutique.ventes'
 
-const ParametresRoute = ParametresRouteImport.update({
-  id: '/parametres',
-  path: '/parametres',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const NotesRoute = NotesRouteImport.update({
-  id: '/notes',
-  path: '/notes',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MateriauxRoute = MateriauxRouteImport.update({
-  id: '/materiaux',
-  path: '/materiaux',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FinancesRoute = FinancesRouteImport.update({
-  id: '/finances',
-  path: '/finances',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DettesRoute = DettesRouteImport.update({
-  id: '/dettes',
-  path: '/dettes',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CommandesRoute = CommandesRouteImport.update({
-  id: '/commandes',
-  path: '/commandes',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ClientsRoute = ClientsRouteImport.update({
@@ -55,19 +31,49 @@ const ClientsRoute = ClientsRouteImport.update({
   path: '/clients',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const CommandesRoute = CommandesRouteImport.update({
+  id: '/commandes',
+  path: '/commandes',
   getParentRoute: () => rootRouteImport,
 } as any)
-const BoutiqueVentesRoute = BoutiqueVentesRouteImport.update({
-  id: '/boutique/ventes',
-  path: '/boutique/ventes',
+const DettesRoute = DettesRouteImport.update({
+  id: '/dettes',
+  path: '/dettes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FinancesRoute = FinancesRouteImport.update({
+  id: '/finances',
+  path: '/finances',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MateriauxRoute = MateriauxRouteImport.update({
+  id: '/materiaux',
+  path: '/materiaux',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NotesRoute = NotesRouteImport.update({
+  id: '/notes',
+  path: '/notes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ParametresRoute = ParametresRouteImport.update({
+  id: '/parametres',
+  path: '/parametres',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BoutiqueCalculateurRoute = BoutiqueCalculateurRouteImport.update({
+  id: '/boutique/calculateur',
+  path: '/boutique/calculateur',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BoutiqueProduitsRoute = BoutiqueProduitsRouteImport.update({
   id: '/boutique/produits',
   path: '/boutique/produits',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BoutiqueVentesRoute = BoutiqueVentesRouteImport.update({
+  id: '/boutique/ventes',
+  path: '/boutique/ventes',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -80,6 +86,7 @@ export interface FileRoutesByFullPath {
   '/materiaux': typeof MateriauxRoute
   '/notes': typeof NotesRoute
   '/parametres': typeof ParametresRoute
+  '/boutique/calculateur': typeof BoutiqueCalculateurRoute
   '/boutique/produits': typeof BoutiqueProduitsRoute
   '/boutique/ventes': typeof BoutiqueVentesRoute
 }
@@ -92,6 +99,7 @@ export interface FileRoutesByTo {
   '/materiaux': typeof MateriauxRoute
   '/notes': typeof NotesRoute
   '/parametres': typeof ParametresRoute
+  '/boutique/calculateur': typeof BoutiqueCalculateurRoute
   '/boutique/produits': typeof BoutiqueProduitsRoute
   '/boutique/ventes': typeof BoutiqueVentesRoute
 }
@@ -105,6 +113,7 @@ export interface FileRoutesById {
   '/materiaux': typeof MateriauxRoute
   '/notes': typeof NotesRoute
   '/parametres': typeof ParametresRoute
+  '/boutique/calculateur': typeof BoutiqueCalculateurRoute
   '/boutique/produits': typeof BoutiqueProduitsRoute
   '/boutique/ventes': typeof BoutiqueVentesRoute
 }
@@ -119,6 +128,7 @@ export interface FileRouteTypes {
     | '/materiaux'
     | '/notes'
     | '/parametres'
+    | '/boutique/calculateur'
     | '/boutique/produits'
     | '/boutique/ventes'
   fileRoutesByTo: FileRoutesByTo
@@ -131,6 +141,7 @@ export interface FileRouteTypes {
     | '/materiaux'
     | '/notes'
     | '/parametres'
+    | '/boutique/calculateur'
     | '/boutique/produits'
     | '/boutique/ventes'
   id:
@@ -143,6 +154,7 @@ export interface FileRouteTypes {
     | '/materiaux'
     | '/notes'
     | '/parametres'
+    | '/boutique/calculateur'
     | '/boutique/produits'
     | '/boutique/ventes'
   fileRoutesById: FileRoutesById
@@ -156,52 +168,18 @@ export interface RootRouteChildren {
   MateriauxRoute: typeof MateriauxRoute
   NotesRoute: typeof NotesRoute
   ParametresRoute: typeof ParametresRoute
+  BoutiqueCalculateurRoute: typeof BoutiqueCalculateurRoute
   BoutiqueProduitsRoute: typeof BoutiqueProduitsRoute
   BoutiqueVentesRoute: typeof BoutiqueVentesRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/parametres': {
-      id: '/parametres'
-      path: '/parametres'
-      fullPath: '/parametres'
-      preLoaderRoute: typeof ParametresRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/notes': {
-      id: '/notes'
-      path: '/notes'
-      fullPath: '/notes'
-      preLoaderRoute: typeof NotesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/materiaux': {
-      id: '/materiaux'
-      path: '/materiaux'
-      fullPath: '/materiaux'
-      preLoaderRoute: typeof MateriauxRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/finances': {
-      id: '/finances'
-      path: '/finances'
-      fullPath: '/finances'
-      preLoaderRoute: typeof FinancesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dettes': {
-      id: '/dettes'
-      path: '/dettes'
-      fullPath: '/dettes'
-      preLoaderRoute: typeof DettesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/commandes': {
-      id: '/commandes'
-      path: '/commandes'
-      fullPath: '/commandes'
-      preLoaderRoute: typeof CommandesRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/clients': {
@@ -211,18 +189,53 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ClientsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/commandes': {
+      id: '/commandes'
+      path: '/commandes'
+      fullPath: '/commandes'
+      preLoaderRoute: typeof CommandesRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/boutique/ventes': {
-      id: '/boutique/ventes'
-      path: '/boutique/ventes'
-      fullPath: '/boutique/ventes'
-      preLoaderRoute: typeof BoutiqueVentesRouteImport
+    '/dettes': {
+      id: '/dettes'
+      path: '/dettes'
+      fullPath: '/dettes'
+      preLoaderRoute: typeof DettesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/finances': {
+      id: '/finances'
+      path: '/finances'
+      fullPath: '/finances'
+      preLoaderRoute: typeof FinancesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/materiaux': {
+      id: '/materiaux'
+      path: '/materiaux'
+      fullPath: '/materiaux'
+      preLoaderRoute: typeof MateriauxRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/notes': {
+      id: '/notes'
+      path: '/notes'
+      fullPath: '/notes'
+      preLoaderRoute: typeof NotesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/parametres': {
+      id: '/parametres'
+      path: '/parametres'
+      fullPath: '/parametres'
+      preLoaderRoute: typeof ParametresRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/boutique/calculateur': {
+      id: '/boutique/calculateur'
+      path: '/boutique/calculateur'
+      fullPath: '/boutique/calculateur'
+      preLoaderRoute: typeof BoutiqueCalculateurRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/boutique/produits': {
@@ -230,6 +243,13 @@ declare module '@tanstack/react-router' {
       path: '/boutique/produits'
       fullPath: '/boutique/produits'
       preLoaderRoute: typeof BoutiqueProduitsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/boutique/ventes': {
+      id: '/boutique/ventes'
+      path: '/boutique/ventes'
+      fullPath: '/boutique/ventes'
+      preLoaderRoute: typeof BoutiqueVentesRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -244,6 +264,7 @@ const rootRouteChildren: RootRouteChildren = {
   MateriauxRoute: MateriauxRoute,
   NotesRoute: NotesRoute,
   ParametresRoute: ParametresRoute,
+  BoutiqueCalculateurRoute: BoutiqueCalculateurRoute,
   BoutiqueProduitsRoute: BoutiqueProduitsRoute,
   BoutiqueVentesRoute: BoutiqueVentesRoute,
 }
