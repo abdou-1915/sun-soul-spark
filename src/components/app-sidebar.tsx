@@ -11,6 +11,7 @@ import {
   ShoppingCart,
   Settings,
   HandCoins,
+  Calculator,
 } from "lucide-react";
 import {
   Sidebar,
@@ -37,6 +38,7 @@ const items = [
 const boutiqueItems = [
   { title: "Produits", url: "/boutique/produits", icon: Smartphone },
   { title: "Ventes", url: "/boutique/ventes", icon: ShoppingCart },
+  { title: "Calculateur", url: "/boutique/calculateur", icon: Calculator },
 ];
 
 export function AppSidebar() {
