@@ -18,6 +18,7 @@ import { Route as FinancesRouteImport } from './routes/finances'
 import { Route as MateriauxRouteImport } from './routes/materiaux'
 import { Route as NotesRouteImport } from './routes/notes'
 import { Route as ParametresRouteImport } from './routes/parametres'
+import { Route as BoutiqueBudgetRouteImport } from './routes/boutique.budget'
 import { Route as BoutiqueCalculateurRouteImport } from './routes/boutique.calculateur'
 import { Route as BoutiqueProduitsRouteImport } from './routes/boutique.produits'
 import { Route as BoutiqueVentesRouteImport } from './routes/boutique.ventes'
@@ -67,6 +68,11 @@ const ParametresRoute = ParametresRouteImport.update({
   path: '/parametres',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BoutiqueBudgetRoute = BoutiqueBudgetRouteImport.update({
+  id: '/boutique/budget',
+  path: '/boutique/budget',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BoutiqueCalculateurRoute = BoutiqueCalculateurRouteImport.update({
   id: '/boutique/calculateur',
   path: '/boutique/calculateur',
@@ -93,6 +99,7 @@ export interface FileRoutesByFullPath {
   '/materiaux': typeof MateriauxRoute
   '/notes': typeof NotesRoute
   '/parametres': typeof ParametresRoute
+  '/boutique/budget': typeof BoutiqueBudgetRoute
   '/boutique/calculateur': typeof BoutiqueCalculateurRoute
   '/boutique/produits': typeof BoutiqueProduitsRoute
   '/boutique/ventes': typeof BoutiqueVentesRoute
@@ -107,6 +114,7 @@ export interface FileRoutesByTo {
   '/materiaux': typeof MateriauxRoute
   '/notes': typeof NotesRoute
   '/parametres': typeof ParametresRoute
+  '/boutique/budget': typeof BoutiqueBudgetRoute
   '/boutique/calculateur': typeof BoutiqueCalculateurRoute
   '/boutique/produits': typeof BoutiqueProduitsRoute
   '/boutique/ventes': typeof BoutiqueVentesRoute
@@ -122,6 +130,7 @@ export interface FileRoutesById {
   '/materiaux': typeof MateriauxRoute
   '/notes': typeof NotesRoute
   '/parametres': typeof ParametresRoute
+  '/boutique/budget': typeof BoutiqueBudgetRoute
   '/boutique/calculateur': typeof BoutiqueCalculateurRoute
   '/boutique/produits': typeof BoutiqueProduitsRoute
   '/boutique/ventes': typeof BoutiqueVentesRoute
@@ -138,6 +147,7 @@ export interface FileRouteTypes {
     | '/materiaux'
     | '/notes'
     | '/parametres'
+    | '/boutique/budget'
     | '/boutique/calculateur'
     | '/boutique/produits'
     | '/boutique/ventes'
@@ -152,6 +162,7 @@ export interface FileRouteTypes {
     | '/materiaux'
     | '/notes'
     | '/parametres'
+    | '/boutique/budget'
     | '/boutique/calculateur'
     | '/boutique/produits'
     | '/boutique/ventes'
@@ -166,6 +177,7 @@ export interface FileRouteTypes {
     | '/materiaux'
     | '/notes'
     | '/parametres'
+    | '/boutique/budget'
     | '/boutique/calculateur'
     | '/boutique/produits'
     | '/boutique/ventes'
@@ -181,6 +193,7 @@ export interface RootRouteChildren {
   MateriauxRoute: typeof MateriauxRoute
   NotesRoute: typeof NotesRoute
   ParametresRoute: typeof ParametresRoute
+  BoutiqueBudgetRoute: typeof BoutiqueBudgetRoute
   BoutiqueCalculateurRoute: typeof BoutiqueCalculateurRoute
   BoutiqueProduitsRoute: typeof BoutiqueProduitsRoute
   BoutiqueVentesRoute: typeof BoutiqueVentesRoute
@@ -251,6 +264,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ParametresRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/boutique/budget': {
+      id: '/boutique/budget'
+      path: '/boutique/budget'
+      fullPath: '/boutique/budget'
+      preLoaderRoute: typeof BoutiqueBudgetRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/boutique/calculateur': {
       id: '/boutique/calculateur'
       path: '/boutique/calculateur'
@@ -285,6 +305,7 @@ const rootRouteChildren: RootRouteChildren = {
   MateriauxRoute: MateriauxRoute,
   NotesRoute: NotesRoute,
   ParametresRoute: ParametresRoute,
+  BoutiqueBudgetRoute: BoutiqueBudgetRoute,
   BoutiqueCalculateurRoute: BoutiqueCalculateurRoute,
   BoutiqueProduitsRoute: BoutiqueProduitsRoute,
   BoutiqueVentesRoute: BoutiqueVentesRoute,

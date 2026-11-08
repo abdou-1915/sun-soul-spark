@@ -13,6 +13,7 @@ import {
   HandCoins,
   Calculator,
   LineChart,
+  PiggyBank,
 } from "lucide-react";
 import {
   Sidebar,
@@ -41,6 +42,7 @@ const boutiqueItems = [
   { title: "Produits", url: "/boutique/produits", icon: Smartphone },
   { title: "Ventes", url: "/boutique/ventes", icon: ShoppingCart },
   { title: "Calculateur", url: "/boutique/calculateur", icon: Calculator },
+  { title: "Budget", url: "/boutique/budget", icon: PiggyBank },
 ];
 
 export function AppSidebar() {
