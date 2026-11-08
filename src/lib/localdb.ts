@@ -256,3 +256,19 @@ export const achatsDevisesDb = {
     save("achats_devises", load<AchatDevise>("achats_devises").filter((r) => r.id !== id));
   },
 };
+
+// ── DÉPENSES EN DEVISES (budget) ─────────────────────────────
+export type DepenseDevise = { id: string; date: string; description: string; usd: number };
+export const depensesDevisesDb = {
+  list(): DepenseDevise[] {
+    return load<DepenseDevise>("depenses_devises").sort((a, b) => b.date.localeCompare(a.date));
+  },
+  insert(form: Omit<DepenseDevise, "id" | "date">) {
+    const item: DepenseDevise = { ...form, id: uid(), date: now() };
+    save("depenses_devises", [item, ...load<DepenseDevise>("depenses_devises")]);
+    return item;
+  },
+  delete(id: string) {
+    save("depenses_devises", load<DepenseDevise>("depenses_devises").filter((r) => r.id !== id));
+  },
+};
