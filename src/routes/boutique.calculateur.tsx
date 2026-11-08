@@ -6,8 +6,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { formatMoney } from "@/lib/types";
-import { achatsDevisesDb, depensesDevisesDb } from "@/lib/localdb";
-import { toast } from "sonner";
 
 export const Route = createFileRoute("/boutique/calculateur")({
   head: () => ({
@@ -33,7 +31,6 @@ function CalculateurPage() {
   const [da, setDa] = useState("80000");
   const [prix, setPrix] = useState("");
   const [devise, setDevise] = useState<"usd" | "eur">("usd");
-  const [tick, setTick] = useState(0);
 
   useEffect(() => {
     try {
@@ -59,10 +56,6 @@ function CalculateurPage() {
           <div><Label>Euros achetés (€)</Label><Input type="number" inputMode="decimal" value={eur} onChange={(e) => setEur(e.target.value)} /></div>
           <div><Label>Dollars reçus ($)</Label><Input type="number" inputMode="decimal" value={usd} onChange={(e) => setUsd(e.target.value)} /></div>
           <div><Label>Dinars payés (DA)</Label><Input type="number" inputMode="decimal" value={da} onChange={(e) => setDa(e.target.value)} /></div>
-          <Button type="button" variant="outline" className="sm:col-span-3"
-            onClick={() => { if (num(da) > 0) { achatsDevisesDb.insert({ eur: num(eur), usd: num(usd), da: num(da) }); setTick((t) => t + 1); toast.success("Achat enregistré dans l'historique"); } }}>
-            Enregistrer cet achat dans l'historique
-          </Button>
         </CardContent>
       </Card>
 
@@ -99,74 +92,6 @@ function CalculateurPage() {
           </div>
         </CardContent>
       </Card>
-
-      <Budget refresh={tick} onChange={() => setTick((t) => t + 1)} />
     </div>
-  );
-}
-
-function Budget({ refresh, onChange }: { refresh: number; onChange: () => void }) {
-  const [desc, setDesc] = useState("");
-  const [montant, setMontant] = useState("");
-  const [achats, setAchats] = useState<ReturnType<typeof achatsDevisesDb.list>>([]);
-  const [deps, setDeps] = useState<ReturnType<typeof depensesDevisesDb.list>>([]);
-  useEffect(() => { setAchats(achatsDevisesDb.list()); setDeps(depensesDevisesDb.list()); }, [refresh]);
-
-  const totUsd = achats.reduce((s, a) => s + a.usd, 0);
-  const totEur = achats.reduce((s, a) => s + a.eur, 0);
-  const totDa = achats.reduce((s, a) => s + a.da, 0);
-  const daParUsd = totUsd > 0 ? totDa / totUsd : 0;
-  const eurParUsd = totUsd > 0 ? totEur / totUsd : 0;
-  const depense = deps.reduce((s, d) => s + d.usd, 0);
-  const solde = totUsd - depense;
-  const m = num(montant);
-
-  const mouvements = [
-    ...achats.map((a) => ({ id: a.id, date: a.date, kind: "in" as const, label: `Achat ${fmt(a.eur)} € → ${fmt(a.usd)} $ (${fmt(a.da)} DA)`, usd: a.usd })),
-    ...deps.map((d) => ({ id: d.id, date: d.date, kind: "out" as const, label: d.description || "Dépense", usd: d.usd })),
-  ].sort((a, b) => b.date.localeCompare(a.date));
-
-  return (
-    <Card>
-      <CardHeader><CardTitle className="text-base">3. Mon budget en devises</CardTitle></CardHeader>
-      <CardContent className="space-y-4">
-        <p className="text-xs text-muted-foreground">Pour ajouter de l'argent : remplissez la partie 1 puis « Enregistrer cet achat ».</p>
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-          <div className="rounded-xl bg-muted/50 p-4"><p className="text-xs text-muted-foreground">Solde en dollar</p><p className="text-2xl font-bold text-primary">{fmt(solde)} $</p></div>
-          <div className="rounded-xl bg-muted/50 p-4"><p className="text-xs text-muted-foreground">Équivalent euro</p><p className="text-2xl font-bold">{fmt(solde * eurParUsd)} €</p></div>
-          <div className="rounded-xl bg-muted/50 p-4"><p className="text-xs text-muted-foreground">Équivalent dinar</p><p className="text-2xl font-bold">{formatMoney(solde * daParUsd)}</p></div>
-        </div>
-        <p className="text-xs text-muted-foreground">Taux moyen : 1 $ = {fmt(daParUsd)} DA = {fmt(eurParUsd)} €</p>
-
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <div><Label>Produit acheté</Label><Input value={desc} onChange={(e) => setDesc(e.target.value)} placeholder="Ex: Écrans iPhone" /></div>
-          <div><Label>Prix en dollar ($)</Label><Input type="number" inputMode="decimal" value={montant} onChange={(e) => setMontant(e.target.value)} placeholder="Ex: 220" /></div>
-        </div>
-        {m > 0 && (
-          <p className="text-sm">Coût : <b>{fmt(m)} $</b> = <b>{fmt(m * eurParUsd)} €</b> = <b>{formatMoney(m * daParUsd)}</b> · Reste : <b>{fmt(solde - m)} $</b></p>
-        )}
-        <Button type="button" className="w-full" onClick={() => {
-          if (m <= 0) return;
-          depensesDevisesDb.insert({ description: desc, usd: m });
-          setDesc(""); setMontant(""); onChange(); toast.success("Dépense enregistrée");
-        }}>Enregistrer la dépense</Button>
-
-        <div className="space-y-2">
-          {mouvements.length === 0 && <p className="text-sm text-muted-foreground">Aucun mouvement.</p>}
-          {mouvements.map((mv) => (
-            <div key={mv.id} className="flex items-center justify-between gap-2 rounded-lg border p-2 text-sm">
-              <div className="min-w-0">
-                <p className="truncate">{mv.label}</p>
-                <p className="text-xs text-muted-foreground">{new Date(mv.date).toLocaleDateString("fr-FR")}{mv.kind === "out" ? ` · ${fmt(mv.usd * eurParUsd)} € · ${formatMoney(mv.usd * daParUsd)}` : ""}</p>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className={mv.kind === "in" ? "font-semibold text-primary" : "font-semibold text-destructive"}>{mv.kind === "in" ? "+" : "−"}{fmt(mv.usd)} $</span>
-                <Button size="sm" variant="ghost" onClick={() => { (mv.kind === "in" ? achatsDevisesDb : depensesDevisesDb).delete(mv.id); onChange(); }}>✕</Button>
-              </div>
-            </div>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
   );
 }
